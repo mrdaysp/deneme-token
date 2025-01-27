@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>Token Satın Al</title>
-	<style>
+    <style>
         body { font-family: Arial; text-align: center; padding: 50px; }
         button { padding: 12px 24px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; margin: 10px; }
         .info-box { margin: 20px auto; padding: 15px; border: 1px solid #ddd; border-radius: 8px; max-width: 400px; text-align: left; }
@@ -10,12 +10,18 @@
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
 </head>
 <body>
-	  <button id="connectBtn">Cüzdanı Bağla</button>
+    <button id="connectBtn">Cüzdanı Bağla</button>
     <div id="walletInfo" class="info-box">
         <p>Adres: <span id="address">-</span></p>
         <p>Ağ: <span id="network">-</span></p>
         <p>BNB Bakiyesi: <span id="balance">-</span></p>
     </div>
+
+    <h1>TOKEN SATIN AL</h1>
+    <input type="number" id="tokenAmount" placeholder="Token Miktarı">
+    <button onclick="calculate()">Hesapla</button>
+    <p id="bnbAmount"></p>
+    <button onclick="buyTokens()" style="display:none;">Satın Al</button>
 
     <script>
         let web3;
@@ -278,12 +284,6 @@ async function buyTokens() {
 }
 	    
     </script>
-    <h1>TOKEN SATIN AL</h1>
-    <input type="number" id="tokenAmount" placeholder="Token Miktarı">
-    <button onclick="calculate()">Hesapla</button>
-    <p id="bnbAmount"></p>
-    <button onclick="buyTokens()" style="display:none;">Satın Al</button>
-
-  
 </body>
 </html>
+
