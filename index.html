@@ -19,7 +19,71 @@
         </div>
     </div>
 
-     <script src="script.js"></script>
+    <script type="module">
+    import { ethers } from "https://cdn.ethers.io/lib/ethers-5.2.esm.min.js";
+// MetaMask Bağlantı Fonksiyonu
+async function connectWallet() {
+    // MetaMask kontrolü
+    if (!window.ethereum) {
+        alert("Lütfen MetaMask yükleyin!");
+        return;
+    }
+
+    try {
+        // BSC Testnet'e geçiş yap
+        await window.ethereum.request({
+            method: "wallet_switchEthereumChain",
+            params: [{ chainId: "0x61" }] // BSC Testnet chainId: 97 (0x61 hex)
+        });
+    } catch (error) {
+        // Eğer ağ ekli değilse, BSC Testnet'i ekle
+        if (error.code === 4902) {
+            try {
+                await window.ethereum.request({
+                    method: "wallet_addEthereumChain",
+                    params: [{
+                        chainId: "0x61",
+                        chainName: "Binance Smart Chain Testnet",
+                        nativeCurrency: {
+                            name: "tBNB",
+                            symbol: "tBNB",
+                            decimals: 18
+                        },
+                        rpcUrls: ["https://data-seed-prebsc-1-s1.binance.org:8545/"],
+                        blockExplorerUrls: ["https://testnet.bscscan.com/"]
+                    }]
+                });
+            } catch (addError) {
+                alert("BSC Testnet eklenemedi!");
+                return;
+            }
+        } else {
+            alert("Ağ değiştirilemedi!");
+            return;
+        }
+    }
+
+    // Cüzdanı bağla
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const accounts = await provider.send("eth_requestAccounts", []);
+
+    // Ağ bilgisini al
+    const network = await provider.getNetwork();
+    const networkName = network.name === "unknown" ? "BSC Testnet" : network.name;
+
+    // Arayüzü güncelle
+    document.getElementById("status").textContent = "Bağlı ✅";
+    document.getElementById("status").style.color = "#28a745";
+    document.getElementById("address").textContent = `${accounts[0].slice(0, 6)}...${accounts[0].slice(-4)}`;
+    document.getElementById("network").textContent = networkName;
+
+    // Butonu devre dışı bırak
+    document.getElementById("connectButton").disabled = true;
+}
+
+// Buton Event Listener
+document.getElementById("connectButton").addEventListener("click", connectWallet);
+    </script>
 </body>
 </html>
 
