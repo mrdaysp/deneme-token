@@ -1,105 +1,194 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BSC Testnet - BNB Bakiyesi</title>
-    <style>
-        body { font-family: Arial; text-align: center; padding: 50px; }
-        button { padding: 12px 24px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; margin: 10px; }
-        .info-box { margin: 20px auto; padding: 15px; border: 1px solid #ddd; border-radius: 8px; max-width: 400px; text-align: left; }
-    </style>
+    <title>Token Satın Al</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
 </head>
 <body>
-    <button id="connectBtn">Cüzdanı Bağla</button>
-    <div id="walletInfo" class="info-box">
-        <p>Adres: <span id="address">-</span></p>
-        <p>Ağ: <span id="network">-</span></p>
-        <p>BNB Bakiyesi: <span id="balance">-</span></p>
-    </div>
-
-    <!-- Web3.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
+    <h1>TOKEN SATIN AL</h1>
+    <input type="number" id="tokenAmount" placeholder="Token Miktarı">
+    <button onclick="calculate()">Hesapla</button>
+    <p id="bnbAmount"></p>
+    <button onclick="buyTokens()" style="display:none;">Satın Al</button>
 
     <script>
+        const tokenSaleAddress = "DEPLOY_EDILEN_KONTRAT_ADRESI";
+        const tokenSaleABI = [[
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_tokenAmount",
+				"type": "uint256"
+			}
+		],
+		"name": "buyTokens",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_tokenAddress",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_projectWallet",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_priceFeed",
+				"type": "address"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "buyer",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "bnbAmount",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "tokenAmount",
+				"type": "uint256"
+			}
+		],
+		"name": "TokensPurchased",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_tokenAmount",
+				"type": "uint256"
+			}
+		],
+		"name": "calculateRequiredBNB",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "FEE_PERCENT",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getBNBPrice",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "PROJECT_WALLET",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "TOKEN",
+		"outputs": [
+			{
+				"internalType": "contract IERC20",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "TOKEN_PRICE_USD",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]];
         let web3;
-        let currentAddress;
 
         async function connectWallet() {
-            if (!window.ethereum) {
-                alert("Lütfen MetaMask yükleyin!");
-                return;
-            }
-
-            try {
-                // BSC Testnet'e geçiş yap
-                await window.ethereum.request({
-                    method: "wallet_switchEthereumChain",
-                    params: [{ chainId: "0x61" }]
-                });
-
+            if (window.ethereum) {
                 web3 = new Web3(window.ethereum);
-                const accounts = await web3.eth.requestAccounts();
-                currentAddress = accounts[0];
-                
-                // Arayüzü güncelle
-                updateUI();
-                
-                // Bakiyeyi otomatik yenileme
-                setInterval(updateBalance, 15000); // 15 saniyede bir
-
-                // Hesap/Ağ değişikliklerini dinle
-                window.ethereum.on('accountsChanged', () => location.reload());
-                window.ethereum.on('chainChanged', () => location.reload());
-
-            } catch (error) {
-                if (error.code === 4902) {
-                    await addBSCNetwork();
-                    connectWallet(); // Tekrar dene
-                } else {
-                    alert("Hata: " + error.message);
-                }
+                await window.ethereum.enable();
             }
         }
 
-        async function updateUI() {
-            // Adres ve Ağ Bilgisi
-            document.getElementById("address").textContent = `${currentAddress.slice(0, 6)}...${currentAddress.slice(-4)}`;
-            const networkId = await web3.eth.net.getId();
-            document.getElementById("network").textContent = networkId === 97 ? "BSC Testnet" : "Yanlış Ağ!";
+        async function calculate() {
+            await connectWallet();
+            const tokenAmount = document.getElementById("tokenAmount").value;
+            const tokenSale = new web3.eth.Contract(tokenSaleABI, tokenSaleAddress);
             
-            // Bakiye
-            await updateBalance();
+            const requiredBNB = await tokenSale.methods.calculateRequiredBNB(tokenAmount).call();
+            document.getElementById("bnbAmount").innerText = `Ödenecek BNB: ${requiredBNB / 1e18}`;
+            document.querySelector("button[onclick='buyTokens()']").style.display = "block";
         }
 
-        async function updateBalance() {
-            try {
-                const balanceWei = await web3.eth.getBalance(currentAddress);
-                const balanceBNB = web3.utils.fromWei(balanceWei, 'ether');
-                document.getElementById("balance").textContent = `${parseFloat(balanceBNB).toFixed(4)} BNB`;
-            } catch (error) {
-                console.error("Bakiye alınamadı:", error);
-            }
-        }
-
-        async function addBSCNetwork() {
-            await window.ethereum.request({
-                method: "wallet_addEthereumChain",
-                params: [{
-                    chainId: "0x61",
-                    chainName: "Binance Smart Chain Testnet",
-                    nativeCurrency: { 
-                        name: "tBNB", 
-                        symbol: "tBNB", 
-                        decimals: 18 
-                    },
-                    rpcUrls: ["https://data-seed-prebsc-1-s1.binance.org:8545/"],
-                    blockExplorerUrls: ["https://testnet.bscscan.com/"]
-                }]
+        async function buyTokens() {
+            const tokenAmount = document.getElementById("tokenAmount").value;
+            const accounts = await web3.eth.getAccounts();
+            
+            const tokenSale = new web3.eth.Contract(tokenSaleABI, tokenSaleAddress);
+            await tokenSale.methods.buyTokens(tokenAmount).send({
+                from: accounts[0],
+                value: document.getElementById("bnbAmount").innerText.split(": ")[1] * 1e18
             });
+            
+            alert("Satın alma başarılı!");
         }
-
-        document.getElementById("connectBtn").addEventListener("click", connectWallet);
     </script>
 </body>
 </html>
