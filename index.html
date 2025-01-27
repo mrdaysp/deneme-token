@@ -3,23 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BEP-20 Token DApp</title>
+    <title>BSC Testnet Cüzdan Bağlama</title>
     <link rel="stylesheet" href="styles.css">
-    <!-- Ethers.js Kütüphanesi -->
-    <script src="https://cdn.ethers.io/lib/ethers-5.6.umd.min.js"></script>
 </head>
 <body>
     <div class="container">
         <!-- Cüzdan Bağlama Butonu -->
-        <button id="connectWalletBtn" class="btn">Cüzdanı Bağla</button>
+        <button id="connectButton" class="button">Cüzdanı Bağla</button>
         
-        <!-- Bağlantı Durumu -->
-        <div id="walletStatus" class="status">
-            <span id="statusText">Cüzdan bağlı değil.</span>
-            <span id="networkText" class="network"></span>
+        <!-- Cüzdan Bilgileri -->
+        <div id="walletInfo" class="wallet-info">
+            <p>Durum: <span id="status">Bağlı değil</span></p>
+            <p>Adres: <span id="address">-</span></p>
+            <p>Ağ: <span id="network">-</span></p>
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Ethers.js -->
+    <script src="https://cdn.ethers.io/lib/ethers-5.6.umd.min.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
+
