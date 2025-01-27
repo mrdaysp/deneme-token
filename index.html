@@ -3,21 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BSC Testnet - MetaMask Bağlantı</title>
+    <title>BSC Testnet - BNB Bakiyesi</title>
     <style>
         body { font-family: Arial; text-align: center; padding: 50px; }
-        button { padding: 12px 24px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; }
-        #walletInfo { margin-top: 20px; }
+        button { padding: 12px 24px; background: #007bff; color: white; border: none; border-radius: 8px; cursor: pointer; margin: 10px; }
+        .info-box { margin: 20px auto; padding: 15px; border: 1px solid #ddd; border-radius: 8px; max-width: 400px; text-align: left; }
     </style>
 </head>
 <body>
     <button id="connectBtn">Cüzdanı Bağla</button>
-    <div id="walletInfo"></div>
+    <div id="walletInfo" class="info-box">
+        <p>Adres: <span id="address">-</span></p>
+        <p>Ağ: <span id="network">-</span></p>
+        <p>BNB Bakiyesi: <span id="balance">-</span></p>
+    </div>
 
     <!-- Web3.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/web3@1.10.0/dist/web3.min.js"></script>
 
     <script>
+        let web3;
+        let currentAddress;
+
         async function connectWallet() {
             if (!window.ethereum) {
                 alert("Lütfen MetaMask yükleyin!");
@@ -28,43 +35,68 @@
                 // BSC Testnet'e geçiş yap
                 await window.ethereum.request({
                     method: "wallet_switchEthereumChain",
-                    params: [{ chainId: "0x61" }] // Hex: 0x61 = 97 (BSC Testnet)
+                    params: [{ chainId: "0x61" }]
                 });
 
-                // Web3 instance oluştur
-                const web3 = new Web3(window.ethereum);
-                
-                // Hesapları iste
+                web3 = new Web3(window.ethereum);
                 const accounts = await web3.eth.requestAccounts();
-                const address = accounts[0];
-
-                // Ağ bilgisini al
-                const networkId = await web3.eth.net.getId();
-                const networkName = networkId === 97 ? "BSC Testnet" : "Bilinmeyen Ağ";
-
+                currentAddress = accounts[0];
+                
                 // Arayüzü güncelle
-                document.getElementById("walletInfo").innerHTML = `
-                    <p>Bağlı Adres: ${address.slice(0, 6)}...${address.slice(-4)}</p>
-                    <p>Ağ: ${networkName}</p>
-                `;
+                updateUI();
+                
+                // Bakiyeyi otomatik yenileme
+                setInterval(updateBalance, 15000); // 15 saniyede bir
+
+                // Hesap/Ağ değişikliklerini dinle
+                window.ethereum.on('accountsChanged', () => location.reload());
+                window.ethereum.on('chainChanged', () => location.reload());
 
             } catch (error) {
                 if (error.code === 4902) {
-                    // BSC Testnet'i ekle
-                    await window.ethereum.request({
-                        method: "wallet_addEthereumChain",
-                        params: [{
-                            chainId: "0x61",
-                            chainName: "Binance Smart Chain Testnet",
-                            nativeCurrency: { name: "tBNB", symbol: "tBNB", decimals: 18 },
-                            rpcUrls: ["https://data-seed-prebsc-1-s1.binance.org:8545/"],
-                            blockExplorerUrls: ["https://testnet.bscscan.com/"]
-                        }]
-                    });
+                    await addBSCNetwork();
+                    connectWallet(); // Tekrar dene
                 } else {
                     alert("Hata: " + error.message);
                 }
             }
+        }
+
+        async function updateUI() {
+            // Adres ve Ağ Bilgisi
+            document.getElementById("address").textContent = `${currentAddress.slice(0, 6)}...${currentAddress.slice(-4)}`;
+            const networkId = await web3.eth.net.getId();
+            document.getElementById("network").textContent = networkId === 97 ? "BSC Testnet" : "Yanlış Ağ!";
+            
+            // Bakiye
+            await updateBalance();
+        }
+
+        async function updateBalance() {
+            try {
+                const balanceWei = await web3.eth.getBalance(currentAddress);
+                const balanceBNB = web3.utils.fromWei(balanceWei, 'ether');
+                document.getElementById("balance").textContent = `${parseFloat(balanceBNB).toFixed(4)} BNB`;
+            } catch (error) {
+                console.error("Bakiye alınamadı:", error);
+            }
+        }
+
+        async function addBSCNetwork() {
+            await window.ethereum.request({
+                method: "wallet_addEthereumChain",
+                params: [{
+                    chainId: "0x61",
+                    chainName: "Binance Smart Chain Testnet",
+                    nativeCurrency: { 
+                        name: "tBNB", 
+                        symbol: "tBNB", 
+                        decimals: 18 
+                    },
+                    rpcUrls: ["https://data-seed-prebsc-1-s1.binance.org:8545/"],
+                    blockExplorerUrls: ["https://testnet.bscscan.com/"]
+                }]
+            });
         }
 
         document.getElementById("connectBtn").addEventListener("click", connectWallet);
