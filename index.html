@@ -3,654 +3,169 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fenoken Purchase</title>
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <title>Fenoken DApp</title>
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.7.4/dist/web3.min.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 20px; }
-        .container { border: 1px solid #ccc; padding: 20px; border-radius: 10px; }
-        input, button { padding: 10px; margin: 5px 0; width: 100%; }
-        .status { margin-top: 15px; padding: 10px; border-radius: 5px; }
-        .success { background: #d4edda; color: #155724; }
-        .error { background: #f8d7da; color: #721c24; }
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        #walletSection {
+            margin: 30px 0;
+        }
+
+        .button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .connect-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .disconnect-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .wallet-info {
+            background: #f5f5f5;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px auto;
+            max-width: 400px;
+        }
+
+        .address {
+            font-family: monospace;
+            word-break: break-all;
+        }
+
+        .balance {
+            font-size: 18px;
+            margin: 10px 0;
+            color: #333;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Fenoken (FENO) Satın Al</h1>
-        
-        <!-- Wallet Connection -->
-        <button onclick="connectWallet()" id="connectButton">MetaMask Bağla</button>
-        <p id="walletAddress"></p>
-
-        <!-- Token Purchase -->
-        <div>
-            <input type="number" id="tokenAmount" placeholder="Token Miktarı" oninput="calculateBnb()">
-            <p>Gerekli BNB: <span id="requiredBnb">0</span></p>
-            <p>Toplam (Ücret Dahil): <span id="totalBnb">0</span></p>
-            <button onclick="buyTokens()" id="buyButton">Token Satın Al</button>
+    <h1>Fenoken DApp</h1>
+    
+    <div id="walletSection">
+        <button id="connectButton" class="button connect-btn">🔗 Cüzdanı Bağla</button>
+        <div id="walletInfo" class="wallet-info" style="display: none;">
+            <p>Connected Address: <span id="walletAddress" class="address"></span></p>
+            <p>Network: <span id="networkInfo"></span></p>
+            <p class="balance">Balance: <span id="balanceAmount">0</span> <span id="balanceSymbol"></span></p>
+            <button id="disconnectButton" class="button disconnect-btn">🚪 Bağlantıyı Kes</button>
         </div>
-
-        <!-- Status Messages -->
-        <div id="status" class="status"></div>
     </div>
 
     <script>
         let web3;
-        let contract;
-        let userAddress;
+        let currentAccount;
 
-        // Kontrat Bilgileri (Deploy sonrası güncelleyin)
-        const contractAddress = "0xCa79f6cA86Bf12Ac1aB54968F2c026CEe5cD48B4";
-        const contractABI = [
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "approve",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "tokenAmount",
-				"type": "uint256"
-			}
-		],
-		"name": "buyTokens",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_projectWallet",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_initialBnbUsdRate",
-				"type": "uint256"
-			},
-			{
-				"internalType": "address",
-				"name": "_initialOwner",
-				"type": "address"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "constructor"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "allowance",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "needed",
-				"type": "uint256"
-			}
-		],
-		"name": "ERC20InsufficientAllowance",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "sender",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "balance",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "needed",
-				"type": "uint256"
-			}
-		],
-		"name": "ERC20InsufficientBalance",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "approver",
-				"type": "address"
-			}
-		],
-		"name": "ERC20InvalidApprover",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "receiver",
-				"type": "address"
-			}
-		],
-		"name": "ERC20InvalidReceiver",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "sender",
-				"type": "address"
-			}
-		],
-		"name": "ERC20InvalidSender",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			}
-		],
-		"name": "ERC20InvalidSpender",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			}
-		],
-		"name": "OwnableInvalidOwner",
-		"type": "error"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "account",
-				"type": "address"
-			}
-		],
-		"name": "OwnableUnauthorizedAccount",
-		"type": "error"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "Approval",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "newRate",
-				"type": "uint256"
-			}
-		],
-		"name": "BnbUsdRateUpdated",
-		"type": "event"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "previousOwner",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "OwnershipTransferred",
-		"type": "event"
-	},
-	{
-		"inputs": [],
-		"name": "renounceOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "_projectWallet",
-				"type": "address"
-			}
-		],
-		"name": "setProjectWallet",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "buyer",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "bnbAmount",
-				"type": "uint256"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "tokenAmount",
-				"type": "uint256"
-			}
-		],
-		"name": "TokensPurchased",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "transfer",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"anonymous": false,
-		"inputs": [
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "Transfer",
-		"type": "event"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "from",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "to",
-				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "value",
-				"type": "uint256"
-			}
-		],
-		"name": "transferFrom",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "transferOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_newRate",
-				"type": "uint256"
-			}
-		],
-		"name": "updateBnbUsdRate",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "owner",
-				"type": "address"
-			},
-			{
-				"internalType": "address",
-				"name": "spender",
-				"type": "address"
-			}
-		],
-		"name": "allowance",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "account",
-				"type": "address"
-			}
-		],
-		"name": "balanceOf",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "bnbUsdRate",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "decimals",
-		"outputs": [
-			{
-				"internalType": "uint8",
-				"name": "",
-				"type": "uint8"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "FEE_PERCENT",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "name",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "owner",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "pricePerTokenInWei",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "projectWallet",
-		"outputs": [
-			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "symbol",
-		"outputs": [
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "totalSupply",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	}
-];
+        const networks = {
+            1: 'Ethereum Mainnet',
+            3: 'Ropsten Testnet',
+            56: 'Binance Smart Chain',
+            97: 'BSC Testnet',
+            137: 'Polygon Mainnet'
+        };
 
-        // MetaMask Bağlantısı
-        async function connectWallet() {
-            if (window.ethereum) {
-                try {
-                    await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    web3 = new Web3(window.ethereum);
-                    userAddress = (await web3.eth.getAccounts())[0];
-                    document.getElementById('walletAddress').textContent = `Bağlı Cüzdan: ${userAddress.slice(0,6)}...${userAddress.slice(-4)}`;
-                    document.getElementById('connectButton").style.display = 'none';
-                    
-                    // Kontratı Initialize Et
-                    contract = new web3.eth.Contract(contractABI, contractAddress);
-                } catch (error) {
-                    showStatus(error.message, 'error');
-                }
-            } else {
-                showStatus('Lütfen MetaMask yükleyin!', 'error');
-            }
-        }
+        const symbols = {
+            1: 'ETH',
+            3: 'ETH',
+            56: 'BNB',
+            97: 'tBNB',
+            137: 'MATIC'
+        };
 
-        // BNB Hesaplama
-        async function calculateBnb() {
-            if (!contract) return;
-            
-            const tokenAmount = document.getElementById('tokenAmount').value;
-            if (!tokenAmount) return;
-
-            try {
-                const pricePerToken = await contract.methods.pricePerTokenInWei().call();
-                const feePercent = 3;
+        // Sayfa yüklendiğinde cüzdan kontrolü
+        window.addEventListener('load', async () => {
+            if (typeof window.ethereum !== 'undefined') {
+                web3 = new Web3(window.ethereum);
                 
-                const requiredBnb = (tokenAmount * pricePerToken) / 1e18;
-                const totalBnb = requiredBnb * (1 + feePercent/100);
+                const accounts = await web3.eth.getAccounts();
+                if (accounts.length > 0) {
+                    currentAccount = accounts[0];
+                    await updateWalletUI();
+                }
 
-                document.getElementById('requiredBnb').textContent = requiredBnb.toFixed(6);
-                document.getElementById('totalBnb').textContent = totalBnb.toFixed(6);
-            } catch (error) {
-                showStatus(error.message, 'error');
-            }
-        }
-
-        // Token Satın Alma
-        async function buyTokens() {
-            if (!contract || !userAddress) return;
-
-            const tokenAmount = document.getElementById('tokenAmount').value;
-            if (!tokenAmount) return;
-
-            try {
-                const totalBnb = document.getElementById('totalBnb').textContent;
-                const weiValue = web3.utils.toWei(totalBnb.toString(), 'ether');
-
-                showStatus('İşlem onayınızı bekliyor...');
-
-                await contract.methods.buyTokens(tokenAmount).send({
-                    from: userAddress,
-                    value: weiValue
-                })
-                .on('receipt', (receipt) => {
-                    showStatus(`Tokenler başarıyla alındı! TX Hash: ${receipt.transactionHash}`, 'success');
-                })
-                .on('error', (error) => {
-                    showStatus(error.message, 'error');
+                window.ethereum.on('accountsChanged', (accounts) => {
+                    currentAccount = accounts[0] || null;
+                    updateWalletUI();
                 });
 
+                window.ethereum.on('chainChanged', () => {
+                    window.location.reload();
+                });
+            }
+        });
+
+        // Cüzdan Bağlama
+        document.getElementById('connectButton').addEventListener('click', async () => {
+            try {
+                if (!window.ethereum) {
+                    alert('Lütfen MetaMask yükleyin!');
+                    return;
+                }
+
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const accounts = await web3.eth.getAccounts();
+                currentAccount = accounts[0];
+                await updateWalletUI();
             } catch (error) {
-                showStatus(error.message, 'error');
+                console.error('Bağlantı hatası:', error);
+                alert('Bağlantı başarısız: ' + error.message);
+            }
+        });
+
+        // Bağlantıyı Kesme
+        document.getElementById('disconnectButton').addEventListener('click', () => {
+            currentAccount = null;
+            document.getElementById('walletInfo').style.display = 'none';
+            document.getElementById('connectButton').style.display = 'block';
+        });
+
+        // Ağ ve Bakiye Bilgilerini Güncelle
+        async function updateNetworkInfo() {
+            const networkId = await web3.eth.getChainId();
+            document.getElementById('networkInfo').textContent = networks[networkId] || `Bilinmeyen Ağ (ID: ${networkId})`;
+            document.getElementById('balanceSymbol').textContent = symbols[networkId] || 'ETH';
+        }
+
+        async function updateBalance() {
+            try {
+                const balanceWei = await web3.eth.getBalance(currentAccount);
+                const balance = web3.utils.fromWei(balanceWei, 'ether');
+                document.getElementById('balanceAmount').textContent = parseFloat(balance).toFixed(4);
+            } catch (error) {
+                console.error('Bakiye alınamadı:', error);
+                document.getElementById('balanceAmount').textContent = 'Hata';
             }
         }
 
-        // Durum Mesajları
-        function showStatus(message, type = 'info') {
-            const statusDiv = document.getElementById('status');
-            statusDiv.className = `status ${type}`;
-            statusDiv.textContent = message;
+        // UI Güncelleme
+        async function updateWalletUI() {
+            if (currentAccount) {
+                document.getElementById('connectButton').style.display = 'none';
+                document.getElementById('walletInfo').style.display = 'block';
+                document.getElementById('walletAddress').textContent = 
+                    `${currentAccount.substring(0, 6)}...${currentAccount.substring(38)}`;
+                await updateNetworkInfo();
+                await updateBalance();
+            }
         }
     </script>
 </body>
