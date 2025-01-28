@@ -49,7 +49,7 @@ const contractABI = [
 			},
 			{
 				"internalType": "uint256",
-				"name": "_pricePerToken",
+				"name": "_initialBnbUsdRate",
 				"type": "uint256"
 			},
 			{
@@ -198,6 +198,19 @@ const contractABI = [
 		"anonymous": false,
 		"inputs": [
 			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "newRate",
+				"type": "uint256"
+			}
+		],
+		"name": "BnbUsdRateUpdated",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
 				"indexed": true,
 				"internalType": "address",
 				"name": "previousOwner",
@@ -216,19 +229,6 @@ const contractABI = [
 	{
 		"inputs": [],
 		"name": "renounceOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_pricePerToken",
-				"type": "uint256"
-			}
-		],
-		"name": "setPricePerToken",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -365,6 +365,19 @@ const contractABI = [
 	{
 		"inputs": [
 			{
+				"internalType": "uint256",
+				"name": "_newRate",
+				"type": "uint256"
+			}
+		],
+		"name": "updateBnbUsdRate",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
 				"internalType": "address",
 				"name": "owner",
 				"type": "address"
@@ -395,6 +408,19 @@ const contractABI = [
 			}
 		],
 		"name": "balanceOf",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "bnbUsdRate",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -459,7 +485,7 @@ const contractABI = [
 	},
 	{
 		"inputs": [],
-		"name": "pricePerToken",
+		"name": "pricePerTokenInWei",
 		"outputs": [
 			{
 				"internalType": "uint256",
