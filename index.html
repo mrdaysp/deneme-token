@@ -70,6 +70,24 @@
             <button id="disconnectButton" class="button disconnect-btn">🚪 Bağlantıyı Kes</button>
         </div>
     </div>
+     <div class="container">
+        <h1>Fenoken (FENO) Satın Al</h1>
+        
+        <!-- Wallet Connection -->
+        <button onclick="connectWallet()" id="connectButton">MetaMask Bağla</button>
+        <p id="walletAddress"></p>
+
+        <!-- Token Purchase -->
+        <div>
+            <input type="number" id="tokenAmount" placeholder="Token Miktarı" oninput="calculateBnb()">
+            <p>Gerekli BNB: <span id="requiredBnb">0</span></p>
+            <p>Toplam (Ücret Dahil): <span id="totalBnb">0</span></p>
+            <button onclick="buyTokens()" id="buyButton">Token Satın Al</button>
+        </div>
+
+        <!-- Status Messages -->
+        <div id="status" class="status"></div>
+    </div>
 
     <script>
         let web3;
