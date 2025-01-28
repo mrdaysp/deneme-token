@@ -1,18 +1,124 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Fenoken Purchase</title>
     <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 600px; margin: 20px auto; padding: 20px; }
+        .container { border: 1px solid #ccc; padding: 20px; border-radius: 10px; }
+        input, button { padding: 10px; margin: 5px 0; width: 100%; }
+        .status { margin-top: 15px; padding: 10px; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
 </head>
 <body>
-    <button id="connectButton">Cüzdanı Bağla</button>
-    <div id="walletInfo"></div>
-    <div>
-        <input type="number" id="tokenAmount" placeholder="Token Miktarı">
-        <button id="buyButton">Token Satın Al</button>
-    </div>
-    <div id="transactionStatus"></div>
+    <div class="container">
+        <h1>Fenoken (FENO) Satın Al</h1>
+        
+        <!-- Wallet Connection -->
+        <button onclick="connectWallet()" id="connectButton">MetaMask Bağla</button>
+        <p id="walletAddress"></p>
 
-    <script src="script.js"></script>
+        <!-- Token Purchase -->
+        <div>
+            <input type="number" id="tokenAmount" placeholder="Token Miktarı" oninput="calculateBnb()">
+            <p>Gerekli BNB: <span id="requiredBnb">0</span></p>
+            <p>Toplam (Ücret Dahil): <span id="totalBnb">0</span></p>
+            <button onclick="buyTokens()" id="buyButton">Token Satın Al</button>
+        </div>
+
+        <!-- Status Messages -->
+        <div id="status" class="status"></div>
+    </div>
+
+    <script>
+        let web3;
+        let contract;
+        let userAddress;
+
+        // Kontrat Bilgileri (Deploy sonrası güncelleyin)
+        const contractAddress = "YOUR_CONTRACT_ADDRESS";
+        const contractABI = [ /* YOUR_CONTRACT_ABI */ ];
+
+        // MetaMask Bağlantısı
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    web3 = new Web3(window.ethereum);
+                    userAddress = (await web3.eth.getAccounts())[0];
+                    document.getElementById('walletAddress').textContent = `Bağlı Cüzdan: ${userAddress.slice(0,6)}...${userAddress.slice(-4)}`;
+                    document.getElementById('connectButton").style.display = 'none';
+                    
+                    // Kontratı Initialize Et
+                    contract = new web3.eth.Contract(contractABI, contractAddress);
+                } catch (error) {
+                    showStatus(error.message, 'error');
+                }
+            } else {
+                showStatus('Lütfen MetaMask yükleyin!', 'error');
+            }
+        }
+
+        // BNB Hesaplama
+        async function calculateBnb() {
+            if (!contract) return;
+            
+            const tokenAmount = document.getElementById('tokenAmount').value;
+            if (!tokenAmount) return;
+
+            try {
+                const pricePerToken = await contract.methods.pricePerTokenInWei().call();
+                const feePercent = 3;
+                
+                const requiredBnb = (tokenAmount * pricePerToken) / 1e18;
+                const totalBnb = requiredBnb * (1 + feePercent/100);
+
+                document.getElementById('requiredBnb').textContent = requiredBnb.toFixed(6);
+                document.getElementById('totalBnb').textContent = totalBnb.toFixed(6);
+            } catch (error) {
+                showStatus(error.message, 'error');
+            }
+        }
+
+        // Token Satın Alma
+        async function buyTokens() {
+            if (!contract || !userAddress) return;
+
+            const tokenAmount = document.getElementById('tokenAmount').value;
+            if (!tokenAmount) return;
+
+            try {
+                const totalBnb = document.getElementById('totalBnb').textContent;
+                const weiValue = web3.utils.toWei(totalBnb.toString(), 'ether');
+
+                showStatus('İşlem onayınızı bekliyor...');
+
+                await contract.methods.buyTokens(tokenAmount).send({
+                    from: userAddress,
+                    value: weiValue
+                })
+                .on('receipt', (receipt) => {
+                    showStatus(`Tokenler başarıyla alındı! TX Hash: ${receipt.transactionHash}`, 'success');
+                })
+                .on('error', (error) => {
+                    showStatus(error.message, 'error');
+                });
+
+            } catch (error) {
+                showStatus(error.message, 'error');
+            }
+        }
+
+        // Durum Mesajları
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+        }
+    </script>
 </body>
 </html>
