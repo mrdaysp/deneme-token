@@ -666,31 +666,40 @@ async function calculateBNB() {
         totalBNB.toFixed(6) + " BNB (Ücret dahil)";
 }
 
+
+//yeni BuyTokens
 async function buyTokens() {
-    const tokenAmount = parseFloat(document.getElementById('tokenAmount').value);
-    const tokenAmountWei = web3.utils.toWei(tokenAmount.toString(), 'gwei');
-    
-    // BNB hesaplamaları
-    const bnbAmount = (tokenAmountWei * 0.01) / 300;
-    const fee = bnbAmount * 0.03;
-	//yeni ekleme
-const bnbWei = web3.utils.toWei(bnbAmount.toString(), 'ether');
-const feeWei = web3.utils.toWei(fee.toString(), 'ether');
+  const tokenAmountInput = document.getElementById('tokenAmount').value;
 
-const totalBNB = web3.utils.toBN(bnbWei).add(web3.utils.toBN(feeWei)).toString();
-	
+  // Girdiyi kontrol et (sayısal mı?)
+  if (!/^\d+\.?\d*$/.test(tokenAmountInput)) {
+    alert("Lütfen geçerli bir token miktarı girin!");
+    return;
+  }
 
-    // İşlemi gönder (BNB ücreti otomatik kesilecek)
-const saleContract = new web3.eth.Contract(saleABI, SALE_ADDRESS);
-	
-  // İşlemi gönder (buffer ile)
-    const receipt = await saleContract.methods.buyTokens(tokenAmountWei)
-      .send({
-        from: userAddress,
-        value: totalBNB,
-        gas: 300000
-      });
-    
+  const BN = web3.utils.BN;
+
+  try {
+    // Hesaplamaları BN ile yap
+    const tokenAmount = new BN(tokenAmountInput.replace('.', '')); // Ondalık için özel işlem
+    const fee = tokenAmount.mul(new BN(3)).div(new BN(100)); // %3 fee
+    const totalTokens = tokenAmount.add(fee);
+    const requiredBNB = totalTokens.mul(new BN(1)).div(new BN(100)).div(new BN(300));
+
+    // Wei dönüşümleri (string kullanarak)
+    const tokenAmountInWei = web3.utils.toWei(totalTokens.toString(), 'gwei');
+    const bnbAmountInWei = web3.utils.toWei(requiredBNB.toString(), 'ether');
+
+	    // Kontrat çağrısı
+    await saleContract.methods.buyTokens(tokenAmountInWei).send({
+      from: userAddress,
+      value: bnbAmountInWei,
+      gas: 300000
+    });
     alert("Satın alma başarılı!");
-    updateBalances();
+	  updateBalances();
+  } catch (error) {
+    console.error("Hata:", error);
+    alert("Satın alma işlemi başarısız oldu: " + error.message);
+  }
 }
