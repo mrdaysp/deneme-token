@@ -644,6 +644,7 @@ function roundTo18Decimals(value) {
 
 const roundedEth = roundTo18Decimals(ethValue);
 const weiValue = web3.utils.toWei(roundedEth, "ether");
+	console.log("Wei Değeri:", weiValue); 
 
     // İşlemi gönder (BNB ücreti otomatik kesilecek)
 
