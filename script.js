@@ -696,8 +696,5 @@ const saleContract = new web3.eth.Contract(saleABI, SALE_ADDRESS);
     });
     alert("Satın alma başarılı!");
 	  updateBalances();
-  catch (error) {
-    console.error("Hata:", error);
-    alert("Satın alma işlemi başarısız oldu: " + error.message);
 
 }
