@@ -415,46 +415,23 @@ const saleABI = [
 	{
 		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "tokenAmount",
-				"type": "uint256"
-			}
-		],
-		"name": "buyTokens",
-		"outputs": [],
-		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "renounceOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "address",
-				"name": "newOwner",
-				"type": "address"
-			}
-		],
-		"name": "transferOwnership",
-		"outputs": [],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
 				"internalType": "address",
 				"name": "_tokenAddress",
 				"type": "address"
 			},
 			{
 				"internalType": "address",
-				"name": "_projectWallet",
+				"name": "_projectWalletBNB",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_projectWalletFENO",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
+				"name": "_tokenWallet",
 				"type": "address"
 			}
 		],
@@ -483,14 +460,14 @@ const saleABI = [
 	{
 		"inputs": [
 			{
-				"internalType": "address",
-				"name": "_newWallet",
-				"type": "address"
+				"internalType": "uint256",
+				"name": "tokenAmount",
+				"type": "uint256"
 			}
 		],
-		"name": "setProjectWallet",
+		"name": "buyTokens",
 		"outputs": [],
-		"stateMutability": "nonpayable",
+		"stateMutability": "payable",
 		"type": "function"
 	},
 	{
@@ -521,7 +498,7 @@ const saleABI = [
 	},
 	{
 		"inputs": [],
-		"name": "projectWallet",
+		"name": "projectWalletBNB",
 		"outputs": [
 			{
 				"internalType": "address",
@@ -530,6 +507,39 @@ const saleABI = [
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "projectWalletFENO",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_newWallet",
+				"type": "address"
+			}
+		],
+		"name": "setProjectWallet",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -556,6 +566,39 @@ const saleABI = [
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "tokenWallet",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "withdrawBNB",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	}
 ];
