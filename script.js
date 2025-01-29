@@ -574,6 +574,7 @@ document.getElementById('connectWallet').addEventListener('click', async () => {
             
             // Bakiyeleri güncelle
             updateBalances();
+		checkag();
             
             // Satın alma bölümünü aç
             document.getElementById('buySection').style.display = 'block';
@@ -585,6 +586,15 @@ document.getElementById('connectWallet').addEventListener('click', async () => {
     }
 });
 
+//ağ kontrolü
+async function checkag() {
+const chainId = await web3.eth.getChainId();
+// BSC Mainnet: 56, BSC Testnet: 97
+if (chainId !== 56 && chainId !== 97) {
+  alert("Lütfen BSC ağına bağlanın!");
+  return;
+}
+	}
 async function updateBalances() {
     // tBNB Bakiyesi
     const bnbBalance = await web3.eth.getBalance(userAddress);
@@ -625,13 +635,6 @@ function calculateBNB() {
     }
 }
 
-//ağ kontrolü
-const chainId = await web3.eth.getChainId();
-// BSC Mainnet: 56, BSC Testnet: 97
-if (chainId !== 56 && chainId !== 97) {
-  alert("Lütfen BSC ağına bağlanın!");
-  return;
-}
 
 //Yenilenmiş fonksiyon
 async function buyTokens() {
