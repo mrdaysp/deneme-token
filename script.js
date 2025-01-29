@@ -685,10 +685,11 @@ async function buyTokens() {
     const fee = tokenAmount.mul(new BN(3)).div(new BN(100)); // %3 fee
     const totalTokens = tokenAmount.add(fee);
     const requiredBNB = totalTokens.mul(new BN(1)).div(new BN(100)).div(new BN(300));
-
+ alert(requiredBNB);
     // Wei dönüşümleri (string kullanarak)
     const tokenAmountInWei = web3.utils.toWei(totalTokens.toString(), 'gwei');
     const bnbAmountInWei = web3.utils.toWei(requiredBNB.toString(), 'ether');
+	   alert(bnbAmountInWei);
 const saleContract = new web3.eth.Contract(saleABI, SALE_ADDRESS);
 	    // Kontrat çağrısı
     await saleContract.methods.buyTokens(tokenAmountInWei).send({
