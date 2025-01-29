@@ -688,7 +688,7 @@ async function buyTokens() {
 	const tokenAmountBN = new BN(tokenAmountWei);
 
     // İşlemi gönder (BNB ücreti otomatik kesilecek)
-    await saleContract.methods.buyTokens(tokenAmountBN).send({
+    await saleContract.methods.buyTokens(tokenAmountWei).send({
         from: userAddress,
         value: bnbWei,
         gas: 300000
