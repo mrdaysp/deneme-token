@@ -593,7 +593,7 @@ async function updateBalances() {
     // FEN Bakiyesi
     tokenContract = new web3.eth.Contract(tokenABI, TOKEN_ADDRESS);
     const tokenBalance = await tokenContract.methods.balanceOf(userAddress).call();
-    document.getElementById('tokenBalance').textContent = web3.utils.fromWei(tokenBalance, 'ether') + " FEN";
+    document.getElementById('tokenBalance').textContent = web3.utils.fromWei(tokenBalance, 'ether') + " FENO";
 }
 
 function calculateBNB() {
