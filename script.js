@@ -625,22 +625,40 @@ function calculateBNB() {
     }
 }
 
+
+//Yenilenmiş fonksiyon
 async function buyTokens() {
-    const tokenAmount = document.getElementById('tokenAmount').value;
+    const tokenAmountInput = document.getElementById('tokenAmount').value;
+    const tokenAmount = parseFloat(tokenAmountInput);
+    
+    if (isNaN(tokenAmount)) {
+        alert("Lütfen geçerli bir token miktarı girin!");
+        return;
+    }
+
     saleContract = new web3.eth.Contract(saleABI, SALE_ADDRESS);
     
-    // BNB hesaplamasını tekrar yap
+    // Fee ve BNB hesaplamaları (decimal 9'a göre)
     const fee = tokenAmount * 0.03;
-    const totalTokens = parseFloat(tokenAmount) + fee;
+    const totalTokens = tokenAmount + fee;
     const requiredBNB = (totalTokens * 0.01) / 300;
     
-    // Kontratı çağır
-    await saleContract.methods.buyTokens(web3.utils.toWei(tokenAmount, 'ether')).send({
-        from: userAddress,
-        value: web3.utils.toWei(requiredBNB.toString(), 'ether'),
-        gas: 300000
-    });
+    // Token miktarını 9 decimal (gwei) formatına çevirme
+    const tokenAmountInWei = web3.utils.toWei(tokenAmount.toString(), 'gwei');
     
-    alert("Satın alma başarılı!");
-    updateBalances();
+    // BNB miktarını 18 decimal (ether) formatına çevirme
+    const bnbAmountInWei = web3.utils.toWei(requiredBNB.toString(), 'ether');
+
+    try {
+        await saleContract.methods.buyTokens(tokenAmountInWei).send({
+            from: userAddress,
+            value: bnbAmountInWei,
+            gas: 300000
+        });
+        alert("Satın alma başarılı!");
+        updateBalances();
+    } catch (error) {
+        console.error("Hata:", error);
+        alert("Satın alma işlemi başarısız oldu!");
+    }
 }
