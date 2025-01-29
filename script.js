@@ -669,11 +669,10 @@ async function calculateBNB() {
     const tokenAmountWei = web3.utils.toWei(tokenAmount.toString(), 'gwei');
 	const bnbWei = calculateBNBWei(tokenAmountWei);
     const bnbAmount = web3.utils.fromWei(bnbWei.toString(), 'ether');
-	const totalBNB = bnbWei
-    
+	  
    
     document.getElementById('requiredBNB').textContent = 
-        totalBNB + " BNB";
+        bnbAmount + " BNB";
 }
 
 async function buyTokens() {
