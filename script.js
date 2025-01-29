@@ -628,7 +628,7 @@ async function buyTokens() {
     const tokenAmountWei = web3.utils.toWei(tokenAmount.toString(), 'gwei');
     
     // BNB hesaplamaları
-    const bnbAmount = (tokenAmount * 0.01) / 300;
+    const bnbAmount = (tokenAmountWei * 0.01) / 300;
     const fee = bnbAmount * 0.03;
 	//yeni ekleme
 const bnbWei = web3.utils.toWei(bnbAmount.toString(), 'ether');
