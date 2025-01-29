@@ -596,7 +596,7 @@ const tokenBalance = await tokenContract.methods.balanceOf(userAddress).call();
 const decimals = await tokenContract.methods.decimals().call(); // Decimal değerini al
 const formattedBalance = (tokenBalance / (10 ** decimals)).toLocaleString();
 document.getElementById('tokenBalance').textContent = formattedBalance + " FENO";
-
+}
 function calculateBNB() {
     const tokenAmount = document.getElementById('tokenAmount').value;
     const fee = tokenAmount * 0.03;
