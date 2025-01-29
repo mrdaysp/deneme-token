@@ -656,11 +656,11 @@ async function calculateBNB() {
     const tokenAmountWei = tokenAmount * 1e9;
     
     // Fiyat hesaplama (1 FEN = 0.01$ ve 1 BNB = 300$ varsayılıyor)
-    const bnbAmount = (tokenAmountWei * 0.01) / 300 / 1e9; // 1e9 ile bölerek BNB'ye çevir
+    const bnbAmount = (tokenAmountWei * 0.01) / (300 * 1e9); // 1e9 ile bölerek BNB'ye çevir
     
    
     document.getElementById('requiredBNB').textContent = 
-        tokenAmountWei + " BNB";
+        bnbAmount + " BNB";
 }
 
 async function buyTokens() {
