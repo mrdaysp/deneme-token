@@ -676,25 +676,22 @@ async function buyTokens() {
     alert("Lütfen geçerli bir token miktarı girin!");
     return;
   }
-
-  const BN = web3.utils.BN;
-
-  try {
-    // Hesaplamaları BN ile yap
-    const tokenAmount = new BN(tokenAmountInput.replace('.', '')); // Ondalık için özel işlem
-    const fee = tokenAmount.mul(new BN(3)).div(new BN(100)); // %3 fee
-    const totalTokens = tokenAmount.add(fee);
-    const requiredBNB = totalTokens.mul(new BN(1)).div(new BN(100)).div(new BN(300));
- alert(requiredBNB);
-    // Wei dönüşümleri (string kullanarak)
-    const tokenAmountInWei = web3.utils.toWei(totalTokens.toString(), 'gwei');
-    const bnbAmountInWei = web3.utils.toWei(requiredBNB.toString(), 'ether');
-	   alert(bnbAmountInWei);
+    
+    // Token miktarını 9 ondalıkla wei'ye çevir (1 FEN = 1e9 wei)
+    const tokenAmountWei = tokenAmountInput * 1e9;
+    
+    // Fiyat hesaplama (1 FEN = 0.01$ ve 1 BNB = 300$ varsayılıyor)
+    const bnbAmount = (tokenAmountWei * 0.01) / 300 / 1e9; // 1e9 ile bölerek BNB'ye çevir
+    
+    // 3% BNB cinsinden ağ ücreti
+    const fee = bnbAmount * 0.03;
+    const totalBNB = bnbAmount + fee;
+	   alert(totalBNB);
 const saleContract = new web3.eth.Contract(saleABI, SALE_ADDRESS);
 	    // Kontrat çağrısı
-    await saleContract.methods.buyTokens(tokenAmountInWei).send({
+    await saleContract.methods.buyTokens(tokenAmountWei).send({
       from: userAddress,
-      value: bnbAmountInWei,
+      value: totalBNB,
       gas: 300000
     });
     alert("Satın alma başarılı!");
