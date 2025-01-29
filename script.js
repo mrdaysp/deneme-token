@@ -666,10 +666,10 @@ async function calculateBNB() {
     const tokenAmount = parseFloat(document.getElementById('tokenAmount').value);
     
     // Token miktarını 9 ondalıkla wei'ye çevir (1 FEN = 1e9 wei)
-    const tokenAmountWei = web3.utils.toWei(tokenAmount, 'gwei');
+    const tokenAmountWei = web3.utils.toWei(tokenAmount.toString(), 'gwei');
 	const bnbWei = calculateBNBWei(tokenAmountWei);
     const bnbAmount = bnbWei
-	const totalBNB = web3.utils.toWei((bnbAmount).toString(), 'ether');
+	const totalBNB = web3.utils.toWei(bnbAmount.toString(), 'ether');
     
    
     document.getElementById('requiredBNB').textContent = 
