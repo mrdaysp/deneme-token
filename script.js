@@ -658,12 +658,9 @@ async function calculateBNB() {
     // Fiyat hesaplama (1 FEN = 0.01$ ve 1 BNB = 300$ varsayılıyor)
     const bnbAmount = (tokenAmountWei * 0.01) / 300 / 1e9; // 1e9 ile bölerek BNB'ye çevir
     
-    // 3% BNB cinsinden ağ ücreti
-    const fee = bnbAmount * 0.03;
-    const totalBNB = bnbAmount + fee;
-    
+   
     document.getElementById('requiredBNB').textContent = 
-        totalBNB.toFixed(6) + " BNB (Ücret dahil)";
+        bnbAmount.toFixed(6) + " BNB";
 }
 
 async function buyTokens() {
@@ -671,8 +668,7 @@ async function buyTokens() {
     const tokenAmountWei = web3.utils.toWei(tokenAmount.toString(), 'gwei');
     
     // BNB hesaplamaları
-    const bnbAmount = (tokenAmount * 0.01) / 300;
-    const fee = bnbAmount * 0.03;
+    const bnbAmount = (tokenAmountWei * 0.01) / 300 / 1e9; // 1e9 ile bölerek BNB'ye çevir
     const totalBNB = web3.utils.toWei((bnbAmount + fee).toString(), 'ether');
 
     // İşlemi gönder (BNB ücreti otomatik kesilecek)
