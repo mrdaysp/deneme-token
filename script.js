@@ -663,9 +663,9 @@ function calculateBNBWei(tokenAmountWei) {
 }
 
 // Örnek Kullanım:
-const tokenAmountWei = "1500000000"; // 1.5 FEN (9 decimal)
+const tokenAmountWei = "100000000"; // 1 FEN (9 decimal)
 const bnbWei = calculateBNBWei(tokenAmountWei);
-console.log(bnbWei.toString()); // 50000000000000 (0.00005 BNB)
+console.log(bnbWei.toString()); 
 
 
 async function calculateBNB() {
