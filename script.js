@@ -673,14 +673,13 @@ async function calculateBNB() {
     
     // Token miktarını 9 ondalıkla wei'ye çevir (1 FEN = 1e9 wei)
     const tokenAmountWei = web3.utils.toWei(tokenAmount.toString(), 'gwei');
-    
-    // Fiyat hesaplama (1 FEN = 0.01$ ve 1 BNB = 300$ varsayılıyor)
 	const bnbWei = calculateBNBWei(tokenAmountWei);
     const bnbAmount = bnbWei
+	const totalBNB = web3.utils.toWei((bnbAmount).toString(), 'ether');
     
    
     document.getElementById('requiredBNB').textContent = 
-        bnbAmount + " BNB";
+        totalBNB + " BNB";
 }
 
 async function buyTokens() {
