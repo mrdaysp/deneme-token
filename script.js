@@ -693,7 +693,7 @@ const saleContract = new web3.eth.Contract(saleABI, SALE_ADDRESS);
       .send({
         from: userAddress,
         value: totalBNB,
-        gas: Math.floor(estimatedGas * 1.2) // %20 buffer
+        gas: Math.floor(estimatedGas * 0.2) // %20 buffer
       });
     
     alert("Satın alma başarılı!");
