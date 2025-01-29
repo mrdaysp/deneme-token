@@ -666,49 +666,22 @@ async function calculateBNB() {
         totalBNB.toFixed(6) + " BNB (Ücret dahil)";
 }
 
-
-//yeni BuyTokens
 async function buyTokens() {
-  const tokenAmountInput = document.getElementById('tokenAmount').value;
-
-  // Girdiyi kontrol et (sayısal mı?)
-  if (!/^\d+\.?\d*$/.test(tokenAmountInput)) {
-    alert("Lütfen geçerli bir token miktarı girin!");
-    return;
-  }
+    const tokenAmount = parseFloat(document.getElementById('tokenAmount').value);
+    const tokenAmountWei = web3.utils.toWei(tokenAmount.toString(), 'gwei');
     
-    // Token miktarını 9 ondalıkla wei'ye çevir (1 FEN = 1e9 wei)
-    const tokenAmountWei = tokenAmountInput * 1e9;
-    
-    // Fiyat hesaplama (1 FEN = 0.01$ ve 1 BNB = 300$ varsayılıyor)
-    const bnbAmount = (tokenAmountWei * 0.01) / 300 / 1e9; // 1e9 ile bölerek BNB'ye çevir
-    
-    // 3% BNB cinsinden ağ ücreti
+    // BNB hesaplamaları
+    const bnbAmount = (tokenAmount * 0.01) / 300;
     const fee = bnbAmount * 0.03;
-    const totalBNB = bnbAmount + fee;
-	
+    const totalBNB = web3.utils.toWei((bnbAmount + fee).toString(), 'ether');
 
-	const Web3 = require('web3');
-const web3 = new Web3();
-const BN = require('bn.js'); // BN.js kütüphanesi
-
-// Ondalık sayıyı wei cinsine çevir (18 ondalık basamak için 'ether' birimi kullanılır)
-const valueInWei = web3.utils.toWei(totalBNB, 'ether'); // 'ether' otomatik olarak 18 basamak kullanır
-
-// BN.js örneği oluştur
-const bnValue = new BN(valueInWei.toString()); 
-console.log(bnValue.toString()); // "34333333333333" çıktısını verir
-
-	
-	   alert(bn);
-const saleContract = new web3.eth.Contract(saleABI, SALE_ADDRESS);
-	    // Kontrat çağrısı
+    // İşlemi gönder (BNB ücreti otomatik kesilecek)
     await saleContract.methods.buyTokens(tokenAmountWei).send({
-      from: userAddress,
-      value: totalBNB.toFixed(18),
-      gas: 300000
+        from: userAddress,
+        value: totalBNB,
+        gas: 300000
     });
+    
     alert("Satın alma başarılı!");
-	  updateBalances();
-
+    updateBalances();
 }
