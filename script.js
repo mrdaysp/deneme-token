@@ -682,18 +682,13 @@ const totalBNB = web3.utils.toBN(bnbWei).add(web3.utils.toBN(feeWei)).toString()
 
     // İşlemi gönder (BNB ücreti otomatik kesilecek)
 const saleContract = new web3.eth.Contract(saleABI, SALE_ADDRESS);
-	 // Gaz tahmini
-    const estimatedGas = await saleContract.methods.buyTokens(tokenAmountWei)
-      .estimateGas({
-        from: userAddress,
-        value: totalBNB
-      });
+	
   // İşlemi gönder (buffer ile)
     const receipt = await saleContract.methods.buyTokens(tokenAmountWei)
       .send({
         from: userAddress,
         value: totalBNB,
-        gas: Math.floor(estimatedGas * 0.2) // %20 buffer
+        gas: 300000
       });
     
     alert("Satın alma başarılı!");
