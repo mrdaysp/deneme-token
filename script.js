@@ -689,7 +689,7 @@ async function buyTokens() {
     // Wei dönüşümleri (string kullanarak)
     const tokenAmountInWei = web3.utils.toWei(totalTokens.toString(), 'gwei');
     const bnbAmountInWei = web3.utils.toWei(requiredBNB.toString(), 'ether');
-
+const saleContract = new web3.eth.Contract(saleABI, SALE_ADDRESS);
 	    // Kontrat çağrısı
     await saleContract.methods.buyTokens(tokenAmountInWei).send({
       from: userAddress,
