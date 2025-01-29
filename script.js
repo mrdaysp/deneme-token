@@ -653,7 +653,7 @@ async function calculateBNB() {
     const tokenAmount = parseFloat(document.getElementById('tokenAmount').value);
     
     // Token miktarını 9 ondalıkla wei'ye çevir (1 FEN = 1e9 wei)
-    const tokenAmountWei = web3.utils.fromWei(tokenAmount, 'gwei');
+    const tokenAmountWei = web3.utils.toWei(tokenAmount.toString(), 'gwei');
     
     // Fiyat hesaplama (1 FEN = 0.01$ ve 1 BNB = 300$ varsayılıyor)
     const bnbAmount = ((tokenAmountWei * 0.01) / 300) / 1e9; // 1e9 ile bölerek BNB'ye çevir
