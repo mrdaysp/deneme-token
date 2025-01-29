@@ -630,14 +630,15 @@ async function buyTokens() {
     // BNB hesaplamaları
     const bnbAmount = (tokenAmount * 0.01) / 300;
     const fee = bnbAmount * 0.03;
-    const totalBNB = web3.utils.toWei((bnbAmount + fee).toString(), 'ether');
 	//yeni ekleme
-	const ethValue = totalBNB; // 22 basamak
+	const ethValue = web3.utils.toWei((bnbAmount + fee).toString(), 'ether');
 
 // Ondalık kısmı 18 basamağa kes
 const truncatedEth = ethValue.replace(/(\.\d{18})\d+/, "$1");
 const weiValue = web3.utils.toWei(truncatedEth, "ether");
 console.log("Wei Değeri:", weiValue);
+    const totalBNB = weiValue
+	
 
     // İşlemi gönder (BNB ücreti otomatik kesilecek)
 
@@ -645,13 +646,13 @@ console.log("Wei Değeri:", weiValue);
     const estimatedGas = await saleContract.methods.buyTokens(tokenAmountWei)
       .estimateGas({
         from: userAddress,
-        value: weiValue
+        value: totalBNB
       });
   // İşlemi gönder (buffer ile)
     const receipt = await saleContract.methods.buyTokens(tokenAmountWei)
       .send({
         from: userAddress,
-        value: weiValue,
+        value: totalBNB,
         gas: Math.floor(estimatedGas * 1.2) // %20 buffer
       });
     
