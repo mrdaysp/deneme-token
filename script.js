@@ -690,7 +690,7 @@ async function buyTokens() {
     // İşlemi gönder (BNB ücreti otomatik kesilecek)
     await saleContract.methods.buyTokens(tokenAmountBN).send({
         from: userAddress,
-        value: bnbAmount,
+        value: bnbWei,
         gas: 300000
     });
     
