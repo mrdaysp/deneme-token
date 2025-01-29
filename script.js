@@ -625,6 +625,13 @@ function calculateBNB() {
     }
 }
 
+//ağ kontrolü
+const chainId = await web3.eth.getChainId();
+// BSC Mainnet: 56, BSC Testnet: 97
+if (chainId !== 56 && chainId !== 97) {
+  alert("Lütfen BSC ağına bağlanın!");
+  return;
+}
 
 //Yenilenmiş fonksiyon
 async function buyTokens() {
@@ -641,13 +648,14 @@ async function buyTokens() {
     // Fee ve BNB hesaplamaları (decimal 9'a göre)
     const fee = tokenAmount * 0.03;
     const totalTokens = tokenAmount + fee;
-    const requiredBNB = (totalTokens * 0.01) / 300;
+    const requiredBNB = totalTokens * 3e-5;
     
     // Token miktarını 9 decimal (gwei) formatına çevirme
     const tokenAmountInWei = web3.utils.toWei(tokenAmount.toString(), 'gwei');
     
     // BNB miktarını 18 decimal (ether) formatına çevirme
-    const bnbAmountInWei = web3.utils.toWei(requiredBNB.toString(), 'ether');
+ const requiredBNBString = totalTokens*3e-5;  
+const bnbAmountInWei = web3.utils.toWei(requiredBNBString, 'ether');
 
     try {
         await saleContract.methods.buyTokens(tokenAmountInWei).send({
