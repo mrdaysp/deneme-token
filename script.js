@@ -686,12 +686,12 @@ async function buyTokens() {
     // 3% BNB cinsinden ağ ücreti
     const fee = bnbAmount * 0.03;
     const totalBNB = bnbAmount + fee;
-	   alert(totalBNB);
+	   alert(totalBNB.toFixed(18));
 const saleContract = new web3.eth.Contract(saleABI, SALE_ADDRESS);
 	    // Kontrat çağrısı
     await saleContract.methods.buyTokens(tokenAmountWei).send({
       from: userAddress,
-      value: totalBNB,
+      value: totalBNB.toFixed(18),
       gas: 300000
     });
     alert("Satın alma başarılı!");
