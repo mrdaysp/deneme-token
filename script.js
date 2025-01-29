@@ -660,7 +660,7 @@ async function calculateBNB() {
     
    
     document.getElementById('requiredBNB').textContent = 
-        bnbAmount + " BNB";
+        tokenAmountWei + " BNB";
 }
 
 async function buyTokens() {
