@@ -631,13 +631,10 @@ async function buyTokens() {
     const bnbAmount = (tokenAmount * 0.01) / 300;
     const fee = bnbAmount * 0.03;
 	//yeni ekleme
-	const ethValue = web3.utils.toWei((bnbAmount + fee).toString(), 'ether');
+const bnbWei = web3.utils.toWei(bnbAmount.toString(), 'ether');
+const feeWei = web3.utils.toWei(fee.toString(), 'ether');
 
-// Ondalık kısmı 18 basamağa kes
-const truncatedEth = ethValue.replace(/(\.\d{18})\d+/, "$1");
-const weiValue = web3.utils.toWei(truncatedEth, "ether");
-console.log("Wei Değeri:", weiValue);
-    const totalBNB = weiValue
+const totalBNB = web3.utils.toBN(bnbWei).add(web3.utils.toBN(feeWei)).toString();
 	
 
     // İşlemi gönder (BNB ücreti otomatik kesilecek)
