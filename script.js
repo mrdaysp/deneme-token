@@ -677,16 +677,17 @@ async function calculateBNB() {
 
 async function buyTokens() {
     const tokenAmount = parseFloat(document.getElementById('tokenAmount').value);
-    const tokenAmountWei = web3.utils.toWei(tokenAmount.toString(), 'gwei');
     
-    // BNB hesaplamaları
-    const bnbAmount = (tokenAmountWei * 0.01) / 300 / 1e9; // 1e9 ile bölerek BNB'ye çevir
-    const totalBNB = web3.utils.toWei((bnbAmount).toString(), 'ether');
+    // Token miktarını 9 ondalıkla wei'ye çevir (1 FEN = 1e9 wei)
+    const tokenAmountWei = web3.utils.toWei(tokenAmount.toString(), 'gwei');
+	const bnbWei = calculateBNBWei(tokenAmountWei);
+    const bnbAmount = web3.utils.fromWei(bnbWei.toString(), 'ether');
+	  
 
     // İşlemi gönder (BNB ücreti otomatik kesilecek)
     await saleContract.methods.buyTokens(tokenAmountWei).send({
         from: userAddress,
-        value: totalBNB,
+        value: bnbAmount,
         gas: 300000
     });
     
