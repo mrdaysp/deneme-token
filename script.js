@@ -660,6 +660,7 @@ async function buyTokens() {
     const bnbAmountInWei = web3.utils.toWei(requiredBNB.toString(), 'ether');
 
     // Kontrat çağrısı
+	  saleContract = new web3.eth.Contract(saleABI, SALE_ADDRESS);
     // Gaz tahmini
     const estimatedGas = await saleContract.methods.buyTokens(tokenAmountInWei)
       .estimateGas({
