@@ -686,7 +686,10 @@ async function buyTokens() {
     // 3% BNB cinsinden ağ ücreti
     const fee = bnbAmount * 0.03;
     const totalBNB = bnbAmount + fee;
-	   alert(totalBNB.toFixed(18));
+	const ethers = require('ethers');
+const value = ethers.utils.parseUnits(totalBNB, 18); // 18 ondalık basamak
+const bn = new BN(value.toString()); // BN.js örneği
+	   alert(bn);
 const saleContract = new web3.eth.Contract(saleABI, SALE_ADDRESS);
 	    // Kontrat çağrısı
     await saleContract.methods.buyTokens(tokenAmountWei).send({
