@@ -688,7 +688,7 @@ async function buyTokens() {
 	const bnbamountBN = new BN(bnbWei);
 
    // Kontratı çağır
-    await saleContract.methods.buyTokens(web3.utils.toWei(tokenAmount, 'ether')).send({
+    await saleContract.methods.buyTokens(web3.utils.toWei(tokenAmount.toString(), 'ether')).send({
         from: userAddress,
         value: bnbWei,
         gas: 300000
