@@ -686,9 +686,20 @@ async function buyTokens() {
     // 3% BNB cinsinden ağ ücreti
     const fee = bnbAmount * 0.03;
     const totalBNB = bnbAmount + fee;
-	const ethers = require('ethers');
-const value = ethers.utils.parseUnits(totalBNB, 18); // 18 ondalık basamak
-const bn = new BN(value.toString()); // BN.js örneği
+	
+
+	const Web3 = require('web3');
+const web3 = new Web3();
+const BN = require('bn.js'); // BN.js kütüphanesi
+
+// Ondalık sayıyı wei cinsine çevir (18 ondalık basamak için 'ether' birimi kullanılır)
+const valueInWei = web3.utils.toWei(totalBNB, 'ether'); // 'ether' otomatik olarak 18 basamak kullanır
+
+// BN.js örneği oluştur
+const bnValue = new BN(valueInWei.toString()); 
+console.log(bnValue.toString()); // "34333333333333" çıktısını verir
+
+	
 	   alert(bn);
 const saleContract = new web3.eth.Contract(saleABI, SALE_ADDRESS);
 	    // Kontrat çağrısı
