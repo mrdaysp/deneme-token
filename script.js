@@ -597,14 +597,32 @@ const decimals = await tokenContract.methods.decimals().call(); // Decimal değe
 const formattedBalance = (tokenBalance / (10 ** decimals)).toLocaleString();
 document.getElementById('tokenBalance').textContent = formattedBalance + " FENO";
 }
+
 function calculateBNB() {
-    const tokenAmount = document.getElementById('tokenAmount').value;
-    const fee = tokenAmount * 0.03;
-    const totalTokens = parseFloat(tokenAmount) + fee;
+    const tokenAmountInput = document.getElementById('tokenAmount').value;
     
-    // Sabit BNB/USD fiyatı (1 BNB = 300$)
-    const requiredBNB = (totalTokens * 0.01) / 300; 
-    document.getElementById('requiredBNB').textContent = requiredBNB.toFixed(6) + " tBNB";
+    try {
+        // Token'ın 9 decimal olduğunu varsayarak çevirim yapıyoruz
+        const tokenAmountBase = web3.utils.toBN(tokenAmountInput);
+        const decimals = web3.utils.toBN(10).pow(web3.utils.toBN(9)); // 10^9
+        const tokenAmountWei = tokenAmountBase.mul(decimals);
+
+        // Fee hesapla: tokenAmount * 3%
+        const feeWei = tokenAmountWei.mul(web3.utils.toBN(3)).div(web3.utils.toBN(100));
+
+        // Toplam token miktarı (wei cinsinden)
+        const totalTokensWei = tokenAmountWei.add(feeWei);
+
+        // BNB hesaplama (totalTokensWei / 30000) - 300$ = 30000 * 0.01$
+        const requiredBNBWei = totalTokensWei.mul(web3.utils.toBN(1e18)).div(web3.utils.toBN(30000));
+
+        // Sonucu BNB cinsinden göstermek için wei'den çevirim
+        const bnbAmount = web3.utils.fromWei(requiredBNBWei, 'ether');
+        document.getElementById('requiredBNB').textContent = `${bnbAmount} BNB (${requiredBNBWei.toString()} wei)`;
+    } catch (error) {
+        console.error(error);
+        document.getElementById('requiredBNB').textContent = "Hesaplama hatası!";
+    }
 }
 
 async function buyTokens() {
