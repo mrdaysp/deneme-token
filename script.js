@@ -684,7 +684,8 @@ async function buyTokens() {
     const bnbAmount = web3.utils.fromWei(bnbWei.toString(), 'ether');
 	  const saleContract = new web3.eth.Contract(saleABI, SALE_ADDRESS);
 
-	const tokenAmountBN = web3.utils.toBN(tokenAmountWei);
+	const BN = web3.utils.BN;
+	const tokenAmountBN = new BN(tokenAmountWei);
 
     // İşlemi gönder (BNB ücreti otomatik kesilecek)
     await saleContract.methods.buyTokens(tokenAmountBN).send({
