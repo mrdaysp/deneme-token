@@ -676,7 +676,8 @@ async function calculateBNB() {
 }
 
 async function buyTokens() {
-    const tokenAmount = parseFloat(document.getElementById('tokenAmount').value);
+  	const tokenAmountInput = document.getElementById('tokenAmount').value;
+const tokenAmount = web3.utils.toBN(tokenAmountInput);
     
     // Token miktarını 9 ondalıkla wei'ye çevir (1 FEN = 1e9 wei)
     const tokenAmountWei = web3.utils.toWei(tokenAmount.toString(), 'gwei');
