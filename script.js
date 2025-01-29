@@ -669,7 +669,7 @@ async function buyTokens() {
     
     // BNB hesaplamaları
     const bnbAmount = (tokenAmountWei * 0.01) / 300 / 1e9; // 1e9 ile bölerek BNB'ye çevir
-    const totalBNB = web3.utils.toWei((bnbAmount + fee).toString(), 'ether');
+    const totalBNB = web3.utils.toWei((bnbAmount).toString(), 'ether');
 
     // İşlemi gönder (BNB ücreti otomatik kesilecek)
     await saleContract.methods.buyTokens(tokenAmountWei).send({
