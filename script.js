@@ -662,17 +662,11 @@ function calculateBNBWei(tokenAmountWei) {
     return bnbWei;
 }
 
-// Örnek Kullanım:
-const tokenAmountWei = "1000000000"; // 1 FEN (9 decimal)
-const bnbWei = calculateBNBWei(tokenAmountWei);
-console.log(bnbWei.toString()); 
-
-
 async function calculateBNB() {
     const tokenAmount = parseFloat(document.getElementById('tokenAmount').value);
     
     // Token miktarını 9 ondalıkla wei'ye çevir (1 FEN = 1e9 wei)
-    const tokenAmountWei = web3.utils.toWei(tokenAmount.toString(), 'gwei');
+    const tokenAmountWei = web3.utils.toWei(tokenAmount, 'gwei');
 	const bnbWei = calculateBNBWei(tokenAmountWei);
     const bnbAmount = bnbWei
 	const totalBNB = web3.utils.toWei((bnbAmount).toString(), 'ether');
