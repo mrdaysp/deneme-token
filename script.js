@@ -591,10 +591,11 @@ async function updateBalances() {
     document.getElementById('bnbBalance').textContent = web3.utils.fromWei(bnbBalance, 'ether') + " tBNB";
     
     // FEN Bakiyesi
-    tokenContract = new web3.eth.Contract(tokenABI, TOKEN_ADDRESS);
-    const tokenBalance = await tokenContract.methods.balanceOf(userAddress).call();
-    document.getElementById('tokenBalance').textContent = web3.utils.fromWei(tokenBalance, 'ether') + " FENO";
-}
+  tokenContract = new web3.eth.Contract(tokenABI, TOKEN_ADDRESS);
+const tokenBalance = await tokenContract.methods.balanceOf(userAddress).call();
+const decimals = await tokenContract.methods.decimals().call(); // Decimal değerini al
+const formattedBalance = (tokenBalance / (10 ** decimals)).toLocaleString();
+document.getElementById('tokenBalance').textContent = formattedBalance + " FENO";
 
 function calculateBNB() {
     const tokenAmount = document.getElementById('tokenAmount').value;
