@@ -649,6 +649,25 @@ async function updateBalances() {
     document.getElementById('tokenBalance').textContent = web3.utils.fromWei(tokenBalance, 'gwei') + " FEN"; // Değişiklik burada
 }
 
+
+
+function calculateBNBWei(tokenAmountWei) {
+    const fenDecimals = 9; // FEN decimal'ı 9 olarak ayarlandı
+    const conversionFactor = BigInt(30000) * (10n ** BigInt(fenDecimals)); // 30000 * 1e9 = 3e13
+    const tokenAmountWeiBigInt = BigInt(tokenAmountWei);
+    
+    // BNB wei cinsinden hesapla (1 BNB = 1e18 wei)
+    const bnbWei = (tokenAmountWeiBigInt * (10n ** 18n)) / conversionFactor;
+    
+    return bnbWei;
+}
+
+// Örnek Kullanım:
+const tokenAmountWei = "1500000000"; // 1.5 FEN (9 decimal)
+const bnbWei = calculateBNBWei(tokenAmountWei);
+console.log(bnbWei.toString()); // 50000000000000 (0.00005 BNB)
+
+
 async function calculateBNB() {
     const tokenAmount = parseFloat(document.getElementById('tokenAmount').value);
     
@@ -656,7 +675,8 @@ async function calculateBNB() {
     const tokenAmountWei = web3.utils.toWei(tokenAmount.toString(), 'gwei');
     
     // Fiyat hesaplama (1 FEN = 0.01$ ve 1 BNB = 300$ varsayılıyor)
-    const bnbAmount = ((tokenAmountWei * 0.01) / 300) / 1e9; // 1e9 ile bölerek BNB'ye çevir
+	const bnbWei = calculateBNBWei(tokenAmountWei);
+    const bnbAmount = bnbWei
     
    
     document.getElementById('requiredBNB').textContent = 
