@@ -609,26 +609,32 @@ document.getElementById('tokenBalance').textContent = formattedBalance + " FENO"
 }
 
 function calculateBNB() {
-    const tokenAmountInput = document.getElementById('tokenAmount').value;
-    
-    try {
-        // Token'ın 9 decimal olduğunu varsayarak çevirim yapıyoruz
-        const tokenAmountBase = web3.utils.toBN(tokenAmountInput);
-        const decimals = web3.utils.toBN(10).pow(web3.utils.toBN(9)); // 10^9
-        const tokenAmountWei = tokenAmountBase.mul(decimals);
 
-        // Fee hesapla: tokenAmount * 3%
-        const feeWei = tokenAmountWei.mul(web3.utils.toBN(0)).div(web3.utils.toBN(100));
 
-        // Toplam token miktarı (wei cinsinden)
-        const totalTokensWei = tokenAmountWei.add(feeWei);
+	 const tokenAmountInput = document.getElementById('tokenAmount').value;
 
-        // BNB hesaplama (totalTokensWei / 30000) - 300$ = 30000 * 0.01$
-        const requiredBNBWei = totalTokensWei.mul(web3.utils.toBN(1e18)).div(web3.utils.toBN(30000));
+  // Girdiyi kontrol et (sayısal mı?)
+  if (!/^\d+\.?\d*$/.test(tokenAmountInput)) {
+    alert("Lütfen geçerli bir token miktarı girin!");
+    return;
+  }
 
-        // Sonucu BNB cinsinden göstermek için wei'den çevirim
-        const bnbAmount = web3.utils.fromWei(requiredBNBWei, 'ether');
-        document.getElementById('requiredBNB').textContent = `${bnbAmount} BNB (${requiredBNBWei.toString()} wei)`;
+  const BN = web3.utils.BN;
+
+  try {
+    // Hesaplamaları BN ile yap
+    const tokenAmount = new BN(tokenAmountInput.replace('.', '')); // Ondalık için özel işlem
+    const fee = tokenAmount.mul(new BN(0)).div(new BN(100)); // %3 fee
+    const totalTokens = tokenAmount.add(fee);
+    const requiredBNB = totalTokens.mul(new BN(1)).div(new BN(100)).div(new BN(300));
+
+    // Wei dönüşümleri (string kullanarak)
+    const tokenAmountInWei = web3.utils.toWei(totalTokens.toString(), 'gwei');
+    const bnbAmountInWei = web3.utils.toWei(requiredBNB.toString(), 'ether');
+
+
+document.getElementById('requiredBNB').textContent = bnbAmountInWei ;
+	  
     } catch (error) {
         console.error(error);
         document.getElementById('requiredBNB').textContent = "Hesaplama hatası!";
