@@ -700,7 +700,7 @@ async function buyTokens() {
     const baseBNB = tokenAmountBN.mul(pricePerToken);
     const feeBNB = baseBNB.mul(feePercentage).div(web3.utils.toBN(100));
     const totalBNB = baseBNB.add(feeBNB).toString();
-    
+     saleContract = new web3.eth.Contract(saleABI, SALE_ADDRESS);
     // İşlemi gönder
     await saleContract.methods.buyTokens(tokenAmountWei).send({
         from: userAddress,
