@@ -676,7 +676,7 @@ async function calculateBNB() {
 }
 
 async function buyTokens() {
-    const tokenAmountInput = document.getElementById('tokenAmount').value;
+    const tokenAmountInput = parseFloat(document.getElementById('tokenAmount').value);
     
     // Token miktarını 9 decimal ile işle
     const tokenAmountWei = web3.utils.toWei(tokenAmount.toString(), 'gwei');
