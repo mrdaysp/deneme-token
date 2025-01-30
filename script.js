@@ -681,7 +681,7 @@ async function buyTokens() {
     // Token miktarını 9 ondalıkla wei'ye çevir (1 FEN = 1e9 wei)
     const tokenAmountWei = web3.utils.toWei(tokenAmount.toString(), 'gwei');
 	const bnbWei = calculateBNBWei(tokenAmountWei);
-    const bnbAmount = web3.utils.toWei(bnbWei.toString(), 'ether');
+    const bnbAmount = bnbWei;
 	  alert(bnbAmount);
     
 	
