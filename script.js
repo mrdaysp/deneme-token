@@ -679,22 +679,19 @@ async function buyTokens() {
     const tokenAmountInput = document.getElementById('tokenAmount').value;
     
     // Token miktarını 9 decimal ile işle
-    const tokenAmountWei = web3.utils.toWei(tokenAmountInput, 'gwei');
+    const tokenAmountWei = web3.utils.toWei(tokenAmount.toString(), 'gwei');
     
     // BNB hesaplamasını tekrar yap
-    const tokenAmountBN = web3.utils.toBN(tokenAmountInput);
-    const pricePerToken = web3.utils.toBN(1e7);
-    const feePercentage = web3.utils.toBN(3);
+   const bnbWei = calculateBNBWei(tokenAmountWei);
+    const bnbAmount = web3.utils.fromWei(bnbWei.toString(), 'ether');
     
-    const baseBNB = tokenAmountBN.mul(pricePerToken);
-    const feeBNB = baseBNB.mul(feePercentage).div(web3.utils.toBN(100));
-    const totalBNB = baseBNB.add(feeBNB).toString();
+	
     saleContract = new web3.eth.Contract(saleABI, SALE_ADDRESS);
     // İşlemi gönder
 	
     await saleContract.methods.buyTokens(tokenAmountWei).send({
         from: userAddress,
-        value: totalBNB,
+        value: bnbAmount,
         gas: 300000
     });
     
