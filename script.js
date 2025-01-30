@@ -676,14 +676,13 @@ async function calculateBNB() {
 }
 
 async function buyTokens() {
-    const tokenAmountInput = parseFloat(document.getElementById('tokenAmount').value);
+    const tokenAmount = parseFloat(document.getElementById('tokenAmount').value);
     
-    // Token miktarını 9 decimal ile işle
+    // Token miktarını 9 ondalıkla wei'ye çevir (1 FEN = 1e9 wei)
     const tokenAmountWei = web3.utils.toWei(tokenAmount.toString(), 'gwei');
-    
-    // BNB hesaplamasını tekrar yap
-   const bnbWei = calculateBNBWei(tokenAmountWei);
+	const bnbWei = calculateBNBWei(tokenAmountWei);
     const bnbAmount = web3.utils.fromWei(bnbWei.toString(), 'ether');
+	  
     
 	
     saleContract = new web3.eth.Contract(saleABI, SALE_ADDRESS);
