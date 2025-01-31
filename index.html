@@ -398,9 +398,10 @@
 		const tokensPerBNB = await contract.methods.tokensPerBNB().call();
 		    console.log("Raw tokensPerBNB:", await contract.methods.tokensPerBNB().call()); //  Console Yansıtması İşlem sonu temizle
   		// Sıfır bölme koruması
+		    const tokensPerBNBWei = new web3.utils.toWei(tokensPerBNB, 'ether');
 		    // BN'ye çevir
-		const tokensPerBNB_BN = web3.utils.toBN(tokensPerBNB.toString());
-		    console.log("Raw tokensPerBNB_BN:", web3.utils.toBN(tokensPerBNB.toString())); //  Console Yansıtması İşlem sonu temizle
+		const tokensPerBNB_BN = web3.utils.toBN(tokensPerBNBWei);
+		    console.log("Raw tokensPerBNB_BN:", web3.utils.toBN(tokensPerBNBWei)); //  Console Yansıtması İşlem sonu temizle
                 if(tokensPerBNB_BN.isZero()) {
                     showError("Token/BNB oranı geçersiz");
                     return;
