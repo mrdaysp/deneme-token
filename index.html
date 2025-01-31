@@ -398,6 +398,8 @@
 		const tokensPerBNB = await contract.methods.tokensPerBNB().call();
 		    console.log("Raw tokensPerBNB:", await contract.methods.tokensPerBNB().call()); //  Console Yansıtması İşlem sonu temizle
   		// Sıfır bölme koruması
+		    // BN'ye çevir
+		const tokensPerBNB_BN = web3.utils.toBN(tokensPerBNB);
                 if(tokensPerBNB.isZero()) {
                     showError("Token/BNB oranı geçersiz");
                     return;
