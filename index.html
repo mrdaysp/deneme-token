@@ -373,6 +373,7 @@
                 const tokenAmountBN = new web3.utils.BN(tokenAmountWei);
                 const precision = web3.utils.toBN('1000000000000000000'); // 1e18
                 const tokensPerBNB = await contract.methods.tokensPerBNB().call();
+		    console.log("Raw bnbPrice:", await contract.methods.tokensPerBNB().call());
                 const tokensPerBNB_BN = web3.utils.toBN(tokensPerBNB);
 
                 // Sıfır bölme koruması
