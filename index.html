@@ -367,7 +367,7 @@
                 }
 
                 // Wei conversion
-                const tokenAmountWei = web3.utils.toWei(tokenAmountInput, 'ether');
+                const tokenAmountWei = new web3.utils.toWei(tokenAmountInput, 'ether');
 		      console.log("Raw tokenAmountWei:", web3.utils.toWei(tokenAmountInput, 'ether')); //  Console Yansıtması İşlem sonu temizle (ÇALIŞTI)
                 
                 // BigNumber işlemleri için hazırlık
