@@ -393,22 +393,27 @@
                 }
 
                 // Wei conversion
-                const tokenAmountWei = new web3.utils.toWei(tokenAmountInput, 'ether');
-		      console.log("Raw tokenAmountWei:", web3.utils.toWei(tokenAmountInput, 'ether')); //  Console Yansıtması İşlem sonu temizle (ÇALIŞTI)
-		     // Hesaplama Girilen miktar x 0,1 = Gerekli USD >> Gerekli USD / BNB Fiyatı
-		    const TokenUSDFiyat = await contract.methods.getTokenPrice().call();
-		    console.log("Raw TokenUSDFiyat:", await contract.methods.getTokenPrice().call()); //  Console Yansıtması İşlem sonu temizle
-		    const bnbPrice = await contract.methods.getBNBPrice().call();
-		    console.log("Raw bnbPrice:", await contract.methods.getBNBPrice().call()); //  Console Yansıtması İşlem sonu temizle
-		    const BnbPriceWei = web3.utils.toWei(bnbPrice, 'ether');
-		    console.log("Raw BnbPriceWei:", web3.utils.toWei(bnbPrice, 'ether')); //  Console Yansıtması İşlem sonu temizle
-		    const HesaplamaAdım1 = tokenAmountWei * TokenUSDFiyat
-		    const HesaplamaAdım2 = HesaplamaAdım1 / BnbPriceWei
-		    console.log("Raw HesaplamaAdım1:", tokenAmountWei * TokenUSDFiyat); //  Console Yansıtması İşlem sonu temizle
-		     console.log("Raw HesaplamaAdım2:", HesaplamaAdım1 / BnbPriceWei); //  Console Yansıtması İşlem sonu temizle
-		    
+const tokenAmountWei = web3.utils.toBN(
+  web3.utils.toWei(tokenAmountInput, 'ether')
+);
+console.log("Token Amount Wei:", tokenAmountWei.toString());
 
-             const requiredBNBWei = HesaplamaAdım2
+const TokenUSDFiyat = web3.utils.toBN(
+  await contract.methods.getTokenPrice().call()
+);
+console.log("Token USD Fiyatı:", TokenUSDFiyat.toString());
+
+const bnbPrice = web3.utils.toBN(
+  await contract.methods.getBNBPrice().call()
+);
+console.log("BNB Fiyatı (USD):", bnbPrice.toString());
+
+// Hesaplama: (tokenAmountWei * TokenUSDFiyat) / bnbPrice
+const HesaplamaAdım1 = tokenAmountWei.mul(TokenUSDFiyat);
+const requiredBNBWei = HesaplamaAdım1.div(bnbPrice);
+
+console.log("Gerekli BNB Miktarı (Wei):", requiredBNBWei.toString());
+
 		     const requiredBNB = web3.utils.fromWei(requiredBNBWei, 'ether');
 		console.log("Raw requiredBNB:", web3.utils.fromWei(requiredBNBWei, 'ether'));
                 // USD değer hesaplama
