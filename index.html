@@ -387,7 +387,7 @@
                 // BNB fiyat bilgisi
                 const bnbPrice = await contract.methods.getBNBPrice().call();
                 const bnbPrice_BN = web3.utils.toBN(bnbPrice);
-		alert("Raw bnbPrice:", await contract.methods.getBNBPrice().call());
+		console.log("Raw bnbPrice:", await contract.methods.getBNBPrice().call());
                 // USD değer hesaplama
                 const requiredBNB = web3.utils.fromWei(requiredBNBWei, 'ether');
                 const usdValue = requiredBNBWei.mul(bnbPrice_BN)
