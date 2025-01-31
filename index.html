@@ -411,9 +411,10 @@ console.log("BNB Fiyatı (USD):", bnbPrice.toString());
 // Hesaplama: (tokenAmountWei * TokenUSDFiyat) / bnbPrice
 const HesaplamaAdım1 = tokenAmountWei.mul(TokenUSDFiyat);
 const requiredBNBWei = HesaplamaAdım1.div(bnbPrice);
+const requiredUSDWei = web3.utils.fromWei(HesaplamaAdım1, 'ether');
 
 console.log("Gerekli BNB Miktarı (Wei):", requiredBNBWei.toString());
-console.log("Gerekli USD Miktarı (Wei):", HesaplamaAdım1.toString());
+console.log("Gerekli USD Miktarı (Wei):", requiredUSDWei.toString());
 
 		     const requiredBNB = web3.utils.fromWei(requiredBNBWei, 'ether');
 		console.log("Raw requiredBNB:", web3.utils.fromWei(requiredBNBWei.toString(), 'ether'));
