@@ -400,9 +400,13 @@
 		    console.log("Raw TokenUSDFiyat:", await contract.methods.getTokenPrice().call()); //  Console Yansıtması İşlem sonu temizle
 		    const bnbPrice = await contract.methods.getBNBPrice().call();
 		    console.log("Raw bnbPrice:", await contract.methods.getBNBPrice().call()); //  Console Yansıtması İşlem sonu temizle
-		    const BnbPriceWei = new web3.utils.toWei(bnbPrice, 'ether');
+		    const BnbPriceWei = web3.utils.toWei(bnbPrice, 'ether');
+		    console.log("Raw BnbPriceWei:", web3.utils.toWei(bnbPrice, 'ether')); //  Console Yansıtması İşlem sonu temizle
 		    const HesaplamaAdım1 = tokenAmountWei * TokenUSDFiyat
 		    const HesaplamaAdım2 = HesaplamaAdım1 / BnbPriceWei
+		    console.log("Raw BnbPriceWei:", HesaplamaAdım1); //  Console Yansıtması İşlem sonu temizle
+		     console.log("Raw BnbPriceWei:", HesaplamaAdım2); //  Console Yansıtması İşlem sonu temizle
+		    
 
              const requiredBNBWei = HesaplamaAdım2
 		     const requiredBNB = web3.utils.fromWei(requiredBNBWei, 'ether');
