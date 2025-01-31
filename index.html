@@ -395,18 +395,6 @@
                 // Wei conversion
                 const tokenAmountWei = new web3.utils.toWei(tokenAmountInput, 'ether');
 		      console.log("Raw tokenAmountWei:", web3.utils.toWei(tokenAmountInput, 'ether')); //  Console Yansıtması İşlem sonu temizle (ÇALIŞTI)
-		const tokensPerBNB = await contract.methods.tokensPerBNB().call();
-		    console.log("Raw tokensPerBNB:", await contract.methods.tokensPerBNB().call()); //  Console Yansıtması İşlem sonu temizle
-  		// Sıfır bölme koruması
-		    const tokensPerBNBWei = web3.utils.toWei(tokensPerBNB, 'ether');
-		    console.log("Raw tokensPerBNBWei:", web3.utils.toWei(tokensPerBNB, 'ether')); //  Console Yansıtması İşlem sonu temizle
-		    // BN'ye çevir
-		const tokensPerBNB_BN = web3.utils.toBN(tokensPerBNBWei);
-		    console.log("Raw tokensPerBNB_BN:", web3.utils.toBN(tokensPerBNBWei)); //  Console Yansıtması İşlem sonu temizle
-                if(tokensPerBNB_BN.isZero()) {
-                    showError("Token/BNB oranı geçersiz");
-                    return;
-                }
 		     // Hesaplama Girilen miktar x 0,1 = Gerekli USD >> Gerekli USD / BNB Fiyatı
 		    const TokenUSDFiyat = await contract.methods.getTokenPrice().call();
 		    console.log("Raw TokenUSDFiyat:", await contract.methods.getTokenPrice().call()); //  Console Yansıtması İşlem sonu temizle
