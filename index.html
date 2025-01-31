@@ -40,7 +40,7 @@
     </div>
 
     <script>
-        const CONTRACT_ADDRESS = '0x8e44b835f4dd0e3242ee6775f238ff268b86309a';
+        const CONTRACT_ADDRESS = '0xa578c2fa105011e7e2b6e132c5a4fc0772905c79';
         const CONTRACT_ABI = [
 	{
 		"inputs": [],
@@ -53,64 +53,94 @@
 		"inputs": [
 			{
 				"internalType": "address",
-				"name": "_tokenAddress",
+				"name": "_token",
 				"type": "address"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_initialTokenPrice",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "_initialBNBPrice",
-				"type": "uint256"
 			}
 		],
 		"stateMutability": "nonpayable",
 		"type": "constructor"
 	},
 	{
-		"anonymous": false,
 		"inputs": [
 			{
-				"indexed": false,
-				"internalType": "string",
-				"name": "asset",
-				"type": "string"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint256",
-				"name": "newPrice",
-				"type": "uint256"
+				"internalType": "address",
+				"name": "owner",
+				"type": "address"
 			}
 		],
-		"name": "PriceUpdated",
-		"type": "event"
+		"name": "OwnableInvalidOwner",
+		"type": "error"
 	},
 	{
 		"inputs": [
 			{
+				"internalType": "address",
+				"name": "account",
+				"type": "address"
+			}
+		],
+		"name": "OwnableUnauthorizedAccount",
+		"type": "error"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "token",
+				"type": "address"
+			}
+		],
+		"name": "SafeERC20FailedOperation",
+		"type": "error"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "receiver",
+				"type": "address"
+			},
+			{
+				"indexed": false,
 				"internalType": "uint256",
-				"name": "_newPrice",
+				"name": "amount",
 				"type": "uint256"
 			}
 		],
-		"name": "setBNBPrice",
+		"name": "EmergencyWithdraw",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "emergencyWithdrawTokens",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
+		"anonymous": false,
 		"inputs": [
 			{
-				"internalType": "uint256",
-				"name": "_newPrice",
-				"type": "uint256"
+				"indexed": true,
+				"internalType": "address",
+				"name": "previousOwner",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
 			}
 		],
-		"name": "setTokenPrice",
+		"name": "OwnershipTransferred",
+		"type": "event"
+	},
+	{
+		"inputs": [],
+		"name": "renounceOwnership",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -141,15 +171,21 @@
 		"type": "event"
 	},
 	{
-		"inputs": [],
-		"name": "withdrawBNB",
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "newOwner",
+				"type": "address"
+			}
+		],
+		"name": "transferOwnership",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
 		"inputs": [],
-		"name": "withdrawTokens",
+		"name": "withdrawBNB",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -160,26 +196,7 @@
 	},
 	{
 		"inputs": [],
-		"name": "bnbPriceUSD",
-		"outputs": [
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "bnbAmount",
-				"type": "uint256"
-			}
-		],
-		"name": "calculateTokensForBNB",
+		"name": "availableTokens",
 		"outputs": [
 			{
 				"internalType": "uint256",
@@ -213,7 +230,7 @@
 				"type": "uint256"
 			}
 		],
-		"stateMutability": "view",
+		"stateMutability": "pure",
 		"type": "function"
 	},
 	{
@@ -234,7 +251,7 @@
 		"name": "token",
 		"outputs": [
 			{
-				"internalType": "contract IBEP20",
+				"internalType": "contract IERC20",
 				"name": "",
 				"type": "address"
 			}
@@ -244,7 +261,59 @@
 	},
 	{
 		"inputs": [],
-		"name": "tokenPriceUSD",
+		"name": "TOKEN_PRICE_USD",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "TOKEN_PRICE_USD8Dec",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "tokensPerBNB",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "totalRaisedUSD",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "totalSold",
 		"outputs": [
 			{
 				"internalType": "uint256",
