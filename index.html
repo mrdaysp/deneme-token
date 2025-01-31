@@ -371,8 +371,8 @@
 		      console.log("Raw tokenAmountWei:", web3.utils.toWei(tokenAmountInput, 'ether')); //  Console Yansıtması İşlem sonu temizle (ÇALIŞTI)
                 
                 // BigNumber işlemleri için hazırlık
-                const tokenAmountBN = new web3.utils.BN(tokenAmountWei);
-		     console.log("Raw tokenAmountBN:", new web3.utils.BN(tokenAmountWei.toString())); //  Console Yansıtması İşlem sonu temizle
+                const tokenAmountBN = new web3.utils.BN(tokenAmountWei.toString());
+		     console.log("Raw tokenAmountBN:", web3.utils.BN(tokenAmountWei.toString())); //  Console Yansıtması İşlem sonu temizle
                 const precision = web3.utils.toBN('1000000000000000000'); // 1e18
                 const tokensPerBNB = await contract.methods.tokensPerBNB().call();
 		    console.log("Raw tokensPerBNB:", await contract.methods.tokensPerBNB().call()); //  Console Yansıtması İşlem sonu temizle
