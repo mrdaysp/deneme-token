@@ -431,7 +431,8 @@
             console.log(message);
             alert(message);
         }
-
+console.log("Raw tokensPerBNB:", await contract.methods.tokensPerBNB().call());
+console.log("Raw BNB Price:", await contract.methods.getBNBPrice().call());
         // Event Listeners
         document.getElementById('connectButton').addEventListener('click', connectWallet);
         document.getElementById('tokenAmount').addEventListener('input', () => {
