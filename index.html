@@ -404,7 +404,7 @@ const TokenUSDFiyat = web3.utils.toBN(
 console.log("Token USD Fiyatı:", TokenUSDFiyat.toString());
 
 const bnbPrice = web3.utils.toBN(
-  await contract.methods.getBNBPrice().call()
+  web3.utils.toWei(await contract.methods.getBNBPrice().call(), 'ether');
 );
 console.log("BNB Fiyatı (USD):", bnbPrice.toString());
 
@@ -415,7 +415,7 @@ const requiredBNBWei = HesaplamaAdım1.div(bnbPrice);
 console.log("Gerekli BNB Miktarı (Wei):", requiredBNBWei.toString());
 
 		     const requiredBNB = web3.utils.fromWei(requiredBNBWei, 'ether');
-		console.log("Raw requiredBNB:", web3.utils.fromWei(requiredBNBWei, 'ether'));
+		console.log("Raw requiredBNB:", web3.utils.fromWei(requiredBNBWei.toString(), 'ether'));
                 // USD değer hesaplama
                 const usdValue = HesaplamaAdım1
                 // Sonuçları göster
