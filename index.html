@@ -348,41 +348,31 @@
         }
 
         // BNB hesaplaması (Güncellenmiş versiyon)
-     async function calculateBNB() {
+    async function calculateBNB() {
     try {
-        document.getElementById('loading').classList.remove('hidden');
         const tokenAmountInput = document.getElementById('tokenAmount').value.replace(',', '.');
+        if (!tokenAmountInput || isNaN(tokenAmountInput)) return;
 
-        // 1. INPUT VALIDATION
-        if (!tokenAmountInput || isNaN(tokenAmountInput)) {
-            resetCalculation();
-            return;
-        }
-
-        // 2. DEĞERLERİ KONTRAKT'TAN AL
-        const [tokensPerBNB, bnbPrice] = await Promise.all([
+        // Ham verileri al
+        const [rawTokensPerBNB, rawBNBPrice] = await Promise.all([
             contract.methods.tokensPerBNB().call(),
             contract.methods.getBNBPrice().call()
         ]);
 
-        // 3. CRITICAL FIX: DECIMAL DÜZELTMESİ
-        const tokensPerBNB_adjusted = tokensPerBNB / 1e18; // Kontraktın 18 decimal'ını düzelt
-        const bnbPriceUSD = bnbPrice / 1e8; // Chainlink'in 8 decimal'ını düzelt
+        // CRITICAL FIX - Decimal ayarlamaları
+        const tokensPerBNB = rawTokensPerBNB / 1e18; // 18 decimal düzeltmesi
+        const bnbPriceUSD = rawBNBPrice / 1e8; // Chainlink 8 decimal düzeltmesi
 
-        // 4. DOĞRU HESAPLAMA FORMÜLÜ
-        const requiredBNB = tokenAmountInput / tokensPerBNB_adjusted;
+        // Hesaplama
+        const requiredBNB = tokenAmountInput / tokensPerBNB;
         const usdValue = requiredBNB * bnbPriceUSD;
 
-        // 5. FORMATLAMA
+        // Formatlama
         document.getElementById('bnbAmount').textContent = `${requiredBNB.toFixed(6)} BNB`;
         document.getElementById('bnbUSD').textContent = `($${usdValue.toFixed(2)})`;
-	console.log("Raw tokensPerBNB:", await contract.methods.tokensPerBNB().call());
-        console.log("Raw BNB Price:", await contract.methods.getBNBPrice().call());
 
     } catch (error) {
-        showError("Hesaplama hatası: " + error.message);
-    } finally {
-        document.getElementById('loading').classList.add('hidden');
+        console.error("Hata:", error);
     }
 }
 
