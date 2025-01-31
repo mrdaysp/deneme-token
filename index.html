@@ -420,7 +420,7 @@ console.log("Gerekli BNB Miktarı (Wei):", requiredBNBWei.toString());
                 const usdValue = HesaplamaAdım1
                 // Sonuçları göster
                 document.getElementById('bnbAmount').textContent = `${requiredBNB} BNB`;
-                document.getElementById('bnbUSD').textContent = `($${(usdValue/1e18).toFixed(2)})`;
+                document.getElementById('bnbUSD').textContent = `($${(usdValue).toFixed(2)})`;
                 
             } catch (error) {
                 showError("Hesaplama hatası: " + error.message);
