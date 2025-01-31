@@ -400,8 +400,8 @@
   		// Sıfır bölme koruması
 		    const tokensPerBNBWei = new web3.utils.toWei(tokensPerBNB, 'ether');
 		    // BN'ye çevir
-		const tokensPerBNB_BN = web3.utils.toBN(tokensPerBNBWei);
-		    console.log("Raw tokensPerBNB_BN:", web3.utils.toBN(tokensPerBNBWei)); //  Console Yansıtması İşlem sonu temizle
+		const tokensPerBNB_BN = web3.utils.toBN(tokensPerBNBWei.toString());
+		    console.log("Raw tokensPerBNB_BN:", web3.utils.toBN(tokensPerBNBWei.toString())); //  Console Yansıtması İşlem sonu temizle
                 if(tokensPerBNB_BN.isZero()) {
                     showError("Token/BNB oranı geçersiz");
                     return;
