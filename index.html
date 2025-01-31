@@ -436,29 +436,68 @@ console.log("Gerekli USD Miktarı (Wei):", requiredUSDWei.toString());
 
         // Satın alma işlemi (Güncellenmiş)
         async function buyTokens() {
-            try {
-                const tokenAmountInput = document.getElementById('tokenAmount').value;
-                if (!tokenAmountInput || tokenAmountInput <= 0) return;
+           
+                try {
+                document.getElementById('loading').classList.remove('hidden');
+                const tokenAmountInput = document.getElementById('tokenAmount').value.replace(',', '.');
+                
+                // Gelişmiş input validasyonu
+                if (!tokenAmountInput || isNaN(tokenAmountInput) || tokenAmountInput <= 0) {
+                    resetCalculation();
+                    return;
+                }
 
-                document.getElementById('buyButton').disabled = true;
+                // Ondalık hassasiyet kontrolü
+                const decimalCount = (tokenAmountInput.split('.')[1] || []).length;
+                if(decimalCount > 18) {
+                    showError("Maksimum 18 ondalık basamak girebilirsiniz");
+                    return;
+                }
+
+                // Wei conversion
+const tokenAmountWei = web3.utils.toBN(
+  web3.utils.toWei(tokenAmountInput, 'ether')
+);
+console.log("Token Amount Wei:", tokenAmountWei.toString());
+
+const TokenUSDFiyat = web3.utils.toBN(
+  await contract.methods.getTokenPrice().call()
+);
+console.log("Token USD Fiyatı:", TokenUSDFiyat.toString());
+
+const bnbPrice = web3.utils.toBN(
+  web3.utils.toWei(await contract.methods.getBNBPrice().call(), 'ether')
+);
+console.log("BNB Fiyatı (USD):", bnbPrice.toString());
+
+// Hesaplama: (tokenAmountWei * TokenUSDFiyat) / bnbPrice
+const HesaplamaAdım1 = tokenAmountWei.mul(TokenUSDFiyat);
+const requiredBNBWei = HesaplamaAdım1.div(bnbPrice);
+const requiredUSDWei = web3.utils.fromWei(HesaplamaAdım1, 'ether');
+
+console.log("Gerekli BNB Miktarı (Wei):", requiredBNBWei.toString());
+console.log("Gerekli USD Miktarı (Wei):", requiredUSDWei.toString());
+
+		     const requiredBNB = web3.utils.fromWei(requiredBNBWei, 'ether');
+		console.log("Raw requiredBNB:", web3.utils.fromWei(requiredBNBWei.toString(), 'ether'));
+                // USD değer hesaplama
+
+		    
+                const usdValue = web3.utils.fromWei(requiredUSDWei, 'ether');
+		     console.log("Raw usdValueWei:", usdValue.toString());
+                // Sonuçları göster
+              document.getElementById('buyButton').disabled = true;
                 document.getElementById('buyButton').textContent = "İşlem Onaylanıyor...";
-
-                // Gerekli BNB hesaplama
-                const tokenAmountWei = web3.utils.toWei(tokenAmountInput, 'ether');
-                const tokensPerBNB = await contract.methods.tokensPerBNB().call();
-                const requiredBNBWei = web3.utils.toBN(tokenAmountWei)
-                    .mul(web3.utils.toBN(1e18.toString()))
-                    .div(web3.utils.toBN(tokensPerBNB));
-
-                // Kontrat çağrısı
+			 // Kontrat çağrısı
                 await contract.methods.buyTokens().send({
                     from: userAddress,
                     value: requiredBNBWei.toString()
                 });
                 
                 showSuccess("Satın alma işlemi başarılı!");
-                
-            } catch (error) {
+            }    
+	    
+	    catch (error) {
                 showError("İşlem hatası: " + error.message);
             } finally {
                 document.getElementById('buyButton').disabled = false;
