@@ -368,6 +368,7 @@
 
                 // Wei conversion
                 const tokenAmountWei = web3.utils.toWei(tokenAmountInput, 'ether');
+		      console.log("Raw tokenAmountWei:", web3.utils.toWei(tokenAmountInput, 'ether')); //  Console Yansıtması İşlem sonu temizle
                 
                 // BigNumber işlemleri için hazırlık
                 const tokenAmountBN = new web3.utils.BN(tokenAmountWei);
@@ -375,6 +376,7 @@
                 const tokensPerBNB = await contract.methods.tokensPerBNB().call();
 		    console.log("Raw tokensPerBNB:", await contract.methods.tokensPerBNB().call()); //  Console Yansıtması İşlem sonu temizle
                 const tokensPerBNB_BN = web3.utils.toBN(tokensPerBNB);
+		     console.log("Raw tokensPerBNB_BN:", web3.utils.toBN(tokensPerBNB)); //  Console Yansıtması İşlem sonu temizle
 		    
 
                 // Sıfır bölme koruması
@@ -386,7 +388,7 @@
                 // Hesaplama Girilen miktar x 0,1 = Gerekli USD >> Gerekli USD / BNB Fiyatı
 		    
                 const requiredBNBWei = tokenAmountBN.mul(precision).div(tokensPerBNB_BN);
-                
+                 console.log("Raw tokenAmountBN:", tokenAmountBN.mul(precision).div(tokensPerBNB_BN)); //  Console Yansıtması İşlem sonu temizle
                 // BNB fiyat bilgisi
                 const bnbPrice = await contract.methods.getBNBPrice().call();
                 const bnbPrice_BN = web3.utils.toBN(bnbPrice);
