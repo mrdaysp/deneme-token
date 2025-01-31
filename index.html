@@ -404,7 +404,7 @@ const TokenUSDFiyat = web3.utils.toBN(
 console.log("Token USD Fiyatı:", TokenUSDFiyat.toString());
 
 const bnbPrice = web3.utils.toBN(
-  web3.utils.toWei(await contract.methods.getBNBPrice().call(), 'ether');
+  web3.utils.toWei(await contract.methods.getBNBPrice().call(), 'ether')
 );
 console.log("BNB Fiyatı (USD):", bnbPrice.toString());
 
