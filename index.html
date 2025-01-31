@@ -336,32 +336,57 @@
         }
 
         // BNB hesaplaması
-        async function calculateBNB() {
-            const tokenAmountInput = document.getElementById('tokenAmount').value;
-            
-            if (!tokenAmountInput || tokenAmountInput <= 0) {
-                document.getElementById('bnbAmount').textContent = '0';
-                return;
-            }
+       async function calculateBNB() {
+    const tokenAmountInput = document.getElementById('tokenAmount').value;
+    
+    // Input validation
+    if (!tokenAmountInput || isNaN(tokenAmountInput) || tokenAmountInput <= 0) {
+        document.getElementById('bnbAmount').textContent = '0';
+        document.getElementById('bnbUSD').textContent = '';
+        return;
+    }
 
-            try {
-                const tokenAmountWei = web3.utils.toWei(tokenAmountInput, 'ether');
-                const tokensPerBNB = await contract.methods.tokensPerBNB().call();
-                const bnbPrice = await contract.methods.getBNBPrice().call();
-
-                const requiredBNBWei = new web3.utils.BN(tokenAmountWei)
-                    .mul(new web3.utils.BN(1e18))
-                    .div(new web3.utils.BN(tokensPerBNB));
-
-                const requiredBNB = web3.utils.fromWei(requiredBNBWei, 'ether');
-                const usdValue = requiredBNB * (web3.utils.fromWei(bnbPrice, 'ether'));
-
-                document.getElementById('bnbAmount').textContent = `${requiredBNB} BNB`;
-                document.getElementById('bnbUSD').textContent = `($${usdValue.toFixed(2)})`;
-            } catch (error) {
-                console.error("Hesaplama hatası:", error);
-            }
+    try {
+        // Ondalıklı sayıları desteklemek için wei conversion
+        const tokenAmountWei = web3.utils.toWei(tokenAmountInput, 'ether');
+        
+        // BN oluşturmadan önce validation
+        if(!web3.utils.isBN(tokenAmountWei) && isNaN(tokenAmountWei)) {
+            throw new Error("Invalid token amount");
         }
+
+        const tokensPerBNB = await contract.methods.tokensPerBNB().call();
+        const bnbPrice = await contract.methods.getBNBPrice().call();
+
+        // Sıfır bölme hatası kontrolü
+        if(tokensPerBNB <= 0) {
+            document.getElementById('bnbAmount').textContent = 'Hata';
+            document.getElementById('bnbUSD').textContent = '(Geçersiz fiyat)';
+            return;
+        }
+
+        // BigNumber işlemleri
+        const tokenAmountBN = new web3.utils.BN(tokenAmountWei);
+        const precisionBN = new web3.utils.BN(1e18.toString());
+        const tokensPerBNB_BN = new web3.utils.BN(tokensPerBNB.toString());
+
+        const requiredBNBWei = tokenAmountBN
+            .mul(precisionBN)
+            .div(tokensPerBNB_BN);
+
+        // BNB fiyat hesaplama
+        const requiredBNB = web3.utils.fromWei(requiredBNBWei, 'ether');
+        const bnbPriceFormatted = web3.utils.fromWei(bnbPrice, 'ether');
+        const usdValue = requiredBNB * bnbPriceFormatted;
+
+        document.getElementById('bnbAmount').textContent = `${requiredBNB} BNB`;
+        document.getElementById('bnbUSD').textContent = `($${usdValue.toFixed(2)})`;
+    } catch (error) {
+        console.error("Hesaplama hatası:", error);
+        document.getElementById('bnbAmount').textContent = 'Hata';
+        document.getElementById('bnbUSD').textContent = '';
+    }
+}
 
         // Satın alma işlemi
         async function buyTokens() {
