@@ -400,6 +400,7 @@
   		// Sıfır bölme koruması
 		    // BN'ye çevir
 		const tokensPerBNB_BN = web3.utils.toBN(tokensPerBNB);
+		    console.log("Raw tokensPerBNB_BN:", web3.utils.toBN(tokensPerBNB)); //  Console Yansıtması İşlem sonu temizle
                 if(tokensPerBNB_BN.isZero()) {
                     showError("Token/BNB oranı geçersiz");
                     return;
@@ -408,7 +409,7 @@
 		    const TokenUSDFiyat = await contract.methods.getTokenPrice().call();
 		    console.log("Raw TokenUSDFiyat:", await contract.methods.getTokenPrice().call()); //  Console Yansıtması İşlem sonu temizle
 		    const bnbPrice = await contract.methods.getBNBPrice().call();
-		    console.log("Raw bnbPrice:", await contract.methods.getTokenPrice().call()); //  Console Yansıtması İşlem sonu temizle
+		    console.log("Raw bnbPrice:", await contract.methods.getBNBPrice().call()); //  Console Yansıtması İşlem sonu temizle
 		    const BnbPriceWei = new web3.utils.toWei(bnbPrice, 'ether');
 		    const HesaplamaAdım1 = tokenAmountWei * TokenUSDFiyat
 		    const HesaplamaAdım2 = HesaplamaAdım1 / BnbPriceWei
