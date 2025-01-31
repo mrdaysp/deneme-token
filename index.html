@@ -421,10 +421,8 @@ console.log("Gerekli USD Miktarı (Wei):", requiredUSDWei.toString());
                 // USD değer hesaplama
 
 		    
-                const usdValueWei = web3.utils.fromWei(requiredUSDWei, 'ether');
+                const usdValue = web3.utils.fromWei(requiredUSDWei, 'ether');
 		     console.log("Raw usdValueWei:", usdValueWei.toString());
-		    const usdValue = web3.utils.fromWei(usdValueWei, 'ether');
-		   console.log("Raw usdValue:", web3.utils.fromWei(usdValueWei.toString(), 'ether'));
                 // Sonuçları göster
                 document.getElementById('bnbAmount').textContent = `${requiredBNB} BNB`;
                 document.getElementById('bnbUSD').textContent = `${usdValue} USD`;
