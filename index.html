@@ -399,6 +399,7 @@
 		    console.log("Raw tokensPerBNB:", await contract.methods.tokensPerBNB().call()); //  Console Yansıtması İşlem sonu temizle
   		// Sıfır bölme koruması
 		    const tokensPerBNBWei = new web3.utils.toWei(tokensPerBNB, 'ether');
+		    console.log("Raw tokensPerBNBWei:", tokensPerBNBWei); //  Console Yansıtması İşlem sonu temizle
 		    // BN'ye çevir
 		const tokensPerBNB_BN = web3.utils.toBN(tokensPerBNBWei.toString());
 		    console.log("Raw tokensPerBNB_BN:", web3.utils.toBN(tokensPerBNBWei.toString())); //  Console Yansıtması İşlem sonu temizle
