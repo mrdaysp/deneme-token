@@ -1,25 +1,138 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Fenoken Sale</title>
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.7.4/dist/web3.min.js"></script>
+    <title>Token Satın Alma</title>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.6.0/dist/web3.min.js"></script>
+    <style>
+        body { font-family: Arial; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .card { background: #f5f5f5; padding: 20px; border-radius: 10px; margin: 20px 0; }
+        input, button { padding: 10px; margin: 5px; width: 95%; }
+        .hidden { display: none; }
+    </style>
 </head>
 <body>
-    <button id="connectWallet">Cüzdanı Bağla</button>
-    
-    <div id="walletInfo" style="display:none;">
-        <p>Adres: <span id="address"></span></p>
-        <p>tBNB Bakiyesi: <span id="bnbBalance"></span></p>
-        <p>FEN Bakiyesi: <span id="tokenBalance"></span></p>
+    <div class="card">
+        <h1>Token Satın Al</h1>
+        <button id="connectButton">Cüzdanı Bağla</button>
+        
+        <div id="buyInterface" class="hidden">
+            <p>Bağlı Adres: <strong id="connectedAddress"></strong></p>
+            
+            <label>Satın Alınacak Token Miktarı:</label>
+            <input type="number" id="tokenAmount" placeholder="Örn: 100" step="1">
+            
+            <p>Gerekli BNB: <span id="bnbAmount">0</span> <span id="bnbUSD"></span></p>
+            <button id="buyButton">Token Satın Al</button>
+        </div>
     </div>
 
-    <div id="buySection" style="display:none;">
-        <input type="number" id="tokenAmount" placeholder="FEN Miktarı">
-        <button onclick="calculateBNB()">BNB Hesapla</button>
-        <p>Gerekli tBNB: <span id="requiredBNB"></span></p>
-        <button onclick="buyTokens()">Satın Al</button>
-    </div>
+    <script>
+        const CONTRACT_ADDRESS = 'YOUR_CONTRACT_ADDRESS';
+        const CONTRACT_ABI = [/* Kontrat ABI'sini buraya ekle */];
+        
+        let web3;
+        let contract;
+        let userAddress;
 
-    <script src="script.js"></script>
+        // Cüzdan bağlantısını yönet
+        async function connectWallet() {
+            if (window.ethereum) {
+                try {
+                    await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    web3 = new Web3(window.ethereum);
+                    await checkNetwork();
+                    initContract();
+                    await loadAccountInfo();
+                    document.getElementById('buyInterface').classList.remove('hidden');
+                } catch (error) {
+                    alert("Cüzdan bağlantısı reddedildi: " + error.message);
+                }
+            } else {
+                alert("Lütfen MetaMask veya Web3 cüzdanı yükleyin!");
+            }
+        }
+
+        // Ağ kontrolü
+        async function checkNetwork() {
+            const chainId = await web3.eth.getChainId();
+            if (chainId !== 97) { // BSC Testnet chainID: 97
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: '0x61' }],
+                    });
+                } catch (error) {
+                    alert("Lütfen BSC Testnet'e geçiş yapın!");
+                }
+            }
+        }
+
+        function initContract() {
+            contract = new web3.eth.Contract(CONTRACT_ABI, CONTRACT_ADDRESS);
+        }
+
+        async function loadAccountInfo() {
+            const accounts = await web3.eth.getAccounts();
+            userAddress = accounts[0];
+            document.getElementById('connectedAddress').textContent = userAddress;
+        }
+
+        // BNB hesaplaması
+        async function calculateBNB() {
+            const tokenAmountInput = document.getElementById('tokenAmount').value;
+            
+            if (!tokenAmountInput || tokenAmountInput <= 0) {
+                document.getElementById('bnbAmount').textContent = '0';
+                return;
+            }
+
+            try {
+                const tokenAmountWei = web3.utils.toWei(tokenAmountInput, 'ether');
+                const tokensPerBNB = await contract.methods.tokensPerBNB().call();
+                const bnbPrice = await contract.methods.getBNBPrice().call();
+
+                const requiredBNBWei = new web3.utils.BN(tokenAmountWei)
+                    .mul(new web3.utils.BN(1e18))
+                    .div(new web3.utils.BN(tokensPerBNB));
+
+                const requiredBNB = web3.utils.fromWei(requiredBNBWei, 'ether');
+                const usdValue = requiredBNB * (web3.utils.fromWei(bnbPrice, 'ether'));
+
+                document.getElementById('bnbAmount').textContent = `${requiredBNB} BNB`;
+                document.getElementById('bnbUSD').textContent = `($${usdValue.toFixed(2)})`;
+            } catch (error) {
+                console.error("Hesaplama hatası:", error);
+            }
+        }
+
+        // Satın alma işlemi
+        async function buyTokens() {
+            const tokenAmountInput = document.getElementById('tokenAmount').value;
+            if (!tokenAmountInput || tokenAmountInput <= 0) return;
+
+            try {
+                const tokenAmountWei = web3.utils.toWei(tokenAmountInput, 'ether');
+                const tokensPerBNB = await contract.methods.tokensPerBNB().call();
+                const requiredBNBWei = new web3.utils.BN(tokenAmountWei)
+                    .mul(new web3.utils.BN(1e18))
+                    .div(new web3.utils.BN(tokensPerBNB));
+
+                await contract.methods.buyTokens().send({
+                    from: userAddress,
+                    value: requiredBNBWei.toString()
+                });
+                
+                alert("Satın alma işlemi başarılı!");
+            } catch (error) {
+                alert("İşlem hatası: " + error.message);
+            }
+        }
+
+        // Event Listeners
+        document.getElementById('connectButton').addEventListener('click', connectWallet);
+        document.getElementById('tokenAmount').addEventListener('input', calculateBNB);
+        document.getElementById('buyButton').addEventListener('click', buyTokens);
+    </script>
 </body>
 </html>
