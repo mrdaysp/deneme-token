@@ -400,7 +400,7 @@
   		// Sıfır bölme koruması
 		    // BN'ye çevir
 		const tokensPerBNB_BN = web3.utils.toBN(tokensPerBNB);
-                if(tokensPerBNB.isZero()) {
+                if(tokensPerBNB_BN.isZero()) {
                     showError("Token/BNB oranı geçersiz");
                     return;
                 }
