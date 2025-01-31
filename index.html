@@ -348,47 +348,35 @@
         }
 
         // BNB hesaplaması (Güncellenmiş versiyon)
-       async function calculateBNB() {
+     async function calculateBNB() {
     try {
         document.getElementById('loading').classList.remove('hidden');
         const tokenAmountInput = document.getElementById('tokenAmount').value.replace(',', '.');
 
-        // Input validation
-        if (!tokenAmountInput || isNaN(tokenAmountInput) || tokenAmountInput <= 0) {
+        // 1. INPUT VALIDATION
+        if (!tokenAmountInput || isNaN(tokenAmountInput)) {
             resetCalculation();
             return;
         }
 
-        // Ondalık kontrolü
-        const tokenAmount = Number(tokenAmountInput);
-        if(isNaN(tokenAmount)) {
-            showError("Geçersiz miktar");
-            return;
-        }
+        // 2. DEĞERLERİ KONTRAKT'TAN AL
+        const [tokensPerBNB, bnbPrice] = await Promise.all([
+            contract.methods.tokensPerBNB().call(),
+            contract.methods.getBNBPrice().call()
+        ]);
 
-        // Contract'tan gerekli verileri al
-        const tokensPerBNB = await contract.methods.tokensPerBNB().call();
-        const bnbPrice = await contract.methods.getBNBPrice().call();
+        // 3. CRITICAL FIX: DECIMAL DÜZELTMESİ
+        const tokensPerBNB_adjusted = tokensPerBNB / 1e18; // Kontraktın 18 decimal'ını düzelt
+        const bnbPriceUSD = bnbPrice / 1e8; // Chainlink'in 8 decimal'ını düzelt
 
-        // Hata kontrolleri
-        if(tokensPerBNB <= 0 || bnbPrice <= 0) {
-            showError("Geçersiz fiyat verisi");
-            return;
-        }
-
-        // 1. DOĞRU HESAPLAMA MANTIĞI
-        // tokensPerBNB = 1 BNB başına alınan token miktarı
-        // requiredBNB = tokenAmount / tokensPerBNB
-        const requiredBNB = tokenAmount / (tokensPerBNB / 1e18); // Decimal adjustment
-        
-        // 2. USD HESAPLAMA
-        const bnbPriceUSD = Number(bnbPrice) / 1e8; // Chainlink 8 decimal
+        // 4. DOĞRU HESAPLAMA FORMÜLÜ
+        const requiredBNB = tokenAmountInput / tokensPerBNB_adjusted;
         const usdValue = requiredBNB * bnbPriceUSD;
 
-        // 3. FORMATLAMA
+        // 5. FORMATLAMA
         document.getElementById('bnbAmount').textContent = `${requiredBNB.toFixed(6)} BNB`;
         document.getElementById('bnbUSD').textContent = `($${usdValue.toFixed(2)})`;
-        
+
     } catch (error) {
         showError("Hesaplama hatası: " + error.message);
     } finally {
