@@ -404,8 +404,8 @@
 		    console.log("Raw BnbPriceWei:", web3.utils.toWei(bnbPrice, 'ether')); //  Console Yansıtması İşlem sonu temizle
 		    const HesaplamaAdım1 = tokenAmountWei * TokenUSDFiyat
 		    const HesaplamaAdım2 = HesaplamaAdım1 / BnbPriceWei
-		    console.log("Raw BnbPriceWei:", HesaplamaAdım1); //  Console Yansıtması İşlem sonu temizle
-		     console.log("Raw BnbPriceWei:", HesaplamaAdım2); //  Console Yansıtması İşlem sonu temizle
+		    console.log("Raw HesaplamaAdım1:", tokenAmountWei * TokenUSDFiyat); //  Console Yansıtması İşlem sonu temizle
+		     console.log("Raw HesaplamaAdım2:", HesaplamaAdım1 / BnbPriceWei); //  Console Yansıtması İşlem sonu temizle
 		    
 
              const requiredBNBWei = HesaplamaAdım2
