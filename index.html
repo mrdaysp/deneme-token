@@ -40,7 +40,7 @@
     </div>
 
     <script>
-        const CONTRACT_ADDRESS = '0xcf7f80116a75c6a22847410472d12c739d88448b';
+        const CONTRACT_ADDRESS = '0xecf0f2779619c9456b82e6b8c6f0fb974d8cf8a4';
         const CONTRACT_ABI = [
 	{
 		"inputs": [],
@@ -373,8 +373,9 @@
                 const tokenAmountBN = new web3.utils.BN(tokenAmountWei);
                 const precision = web3.utils.toBN('1000000000000000000'); // 1e18
                 const tokensPerBNB = await contract.methods.tokensPerBNB().call();
-		    console.log("Raw bnbPrice:", await contract.methods.tokensPerBNB().call());
+		    console.log("Raw tokensPerBNB:", await contract.methods.tokensPerBNB().call()); //  Console Yansıtması İşlem sonu temizle
                 const tokensPerBNB_BN = web3.utils.toBN(tokensPerBNB);
+		    
 
                 // Sıfır bölme koruması
                 if(tokensPerBNB_BN.isZero()) {
@@ -382,7 +383,8 @@
                     return;
                 }
 
-                // Hesaplama
+                // Hesaplama Girilen miktar x 0,1 = Gerekli USD >> Gerekli USD / BNB Fiyatı
+		    
                 const requiredBNBWei = tokenAmountBN.mul(precision).div(tokensPerBNB_BN);
                 
                 // BNB fiyat bilgisi
